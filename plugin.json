@@ -1,0 +1,28 @@
+{
+  "name": "odm_ui",
+  "version": "1.0",
+  "description": {
+    "en": "Object Document Mapper UI",
+    "ru": "Object Document Mapper UI",
+    "uk": "Object Document Mapper UI"
+  },
+  "url": "https://github.com/pytsite/plugin-odm_ui",
+  "author": {
+    "name": "Alexander Shepetko",
+    "email": "a@shepetko.com",
+    "url": "https://shepetko.com"
+  },
+  "requires": {
+    "packages": [],
+    "plugins": [
+      "admin",
+      "assetman",
+      "auth_web",
+      "form",
+      "http_api",
+      "odm",
+      "odm_auth",
+      "widget"
+    ]
+  }
+}
