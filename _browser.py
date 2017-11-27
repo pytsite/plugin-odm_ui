@@ -1,9 +1,9 @@
 """PytSite Object Document Mapper UI Plugin Entities Browser
 """
 from typing import Callable as _Callable, Union as _Union
-from pytsite import router as _router, metatag as _metatag, lang as _lang, http as _http, html as _html, \
+from pytsite import router as _router, metatag as _metatag, lang as _lang, http as _http, html as _html
+from plugins import widget as _widget, auth as _auth, odm as _odm, permissions as _permissions, odm_auth as _odm_auth, \
     http_api as _http_api
-from plugins import widget as _widget, auth as _auth, odm as _odm, permissions as _permissions, odm_auth as _odm_auth
 from . import _api, _model
 
 __author__ = 'Alexander Shepetko'
