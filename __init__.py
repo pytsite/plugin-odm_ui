@@ -16,18 +16,17 @@ def _init():
     from . import _controllers, _http_api_controllers
 
     abp = admin.base_path()
-    auth_filter = 'auth_web@authorize'
+    auth_filter = admin.AdminAccessFilterController
 
     # Route: ODM browser page
-    router.handle(_controllers.Browse(), abp + '/odm_ui/<model>', 'odm_ui@browse', filters=auth_filter)
+    router.handle(_controllers.Browse, abp + '/odm_ui/<model>', 'odm_ui@browse', filters=auth_filter)
 
     # Route: 'create/modify' ODM entity form display
-    router.handle(_controllers.ModifyForm(), abp + '/odm_ui/<model>/modify/<eid>', 'odm_ui@m_form',
-                  filters=auth_filter)
+    router.handle(_controllers.ModifyForm, abp + '/odm_ui/<model>/modify/<eid>', 'odm_ui@m_form', filters=auth_filter)
 
     # Route: 'delete' form display
-    router.handle(_controllers.DeleteForm(), abp + '/odm_ui/<model>/delete', 'odm_ui@d_form',
-                  methods=('GET', 'POST'), filters=auth_filter)
+    router.handle(_controllers.DeleteForm, abp + '/odm_ui/<model>/delete', 'odm_ui@d_form', methods=('GET', 'POST'),
+                  filters=auth_filter)
 
     # Resources
     lang.register_package(__name__)
@@ -37,7 +36,7 @@ def _init():
     assetman.t_js(__name__ + '@**/*.js')
 
     # HTTP API handlers
-    http_api.handle('GET', 'odm_ui/rows/<model>', _http_api_controllers.GetRows(), 'odm_ui@get_rows')
+    http_api.handle('GET', 'odm_ui/rows/<model>', _http_api_controllers.GetRows, 'odm_ui@get_rows')
 
 
 _init()
