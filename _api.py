@@ -25,11 +25,11 @@ def get_model_class(model: str) -> _Type[_model.UIEntity]:
     """Get ODM UI model class.
     """
     model_class = _odm.get_model_class(model)
-    if not issubclass(model_class, _odm_auth.model.AuthorizableEntity):
-        raise TypeError("Model '{}' must extend 'odm_auth.model.PermMixin'".format(model))
+    if not issubclass(model_class, _odm_auth.model.OwnedEntity):
+        raise TypeError('{} must extend {}'.format(model_class, _odm_auth.model.OwnedEntity))
 
     if not issubclass(model_class, _model.UIEntity):
-        raise TypeError("Model '{}' must extend 'odm_ui.model.UIMixin'".format(model))
+        raise TypeError('{} must extend {}'.format(model_class, _model.UIEntity))
 
     return model_class
 

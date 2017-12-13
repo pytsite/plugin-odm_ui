@@ -9,7 +9,7 @@ __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
 
-class UIEntity(_odm_auth.model.AuthorizableEntity):
+class UIEntity(_odm_auth.model.OwnedEntity):
     """ODM entity with UI related methods.
     """
 
