@@ -148,7 +148,7 @@ class Modify(_form.Form):
 
         except Exception as exc:
             _router.session().add_error_message(str(exc))
-            _logger.error(str(exc), exc_info=exc, stack_info=True)
+            _logger.error(exc)
             raise exc
 
         # Process 'special' redirect endpoint
@@ -251,7 +251,7 @@ class Delete(MassAction):
 
         # Entity deletion was forbidden
         except _errors.ForbidDeletion as e:
-            _logger.error(str(e), exc_info=e)
+            _logger.error(e)
             _router.session().add_error_message(_lang.t('odm_ui@entity_deletion_forbidden') + '. ' + str(e))
 
         default_redirect = _router.rule_url('odm_ui@browse', {'model': self._model})

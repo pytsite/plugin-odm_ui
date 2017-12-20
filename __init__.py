@@ -14,9 +14,20 @@ if _plugman.is_installed(__name__):
 
 
 def plugin_load():
+    from plugins import assetman
+
+    assetman.register_package(__name__)
+    assetman.t_js(__name__)
+
+
+def plugin_load_uwsgi():
     from pytsite import tpl, lang, router
-    from plugins import assetman, admin, http_api
+    from plugins import admin, http_api
     from . import _controllers, _http_api_controllers
+
+    # Resources
+    lang.register_package(__name__)
+    tpl.register_package(__name__)
 
     abp = admin.base_path()
     auth_filter = admin.AdminAccessFilterController
@@ -31,12 +42,12 @@ def plugin_load():
     router.handle(_controllers.DeleteForm, abp + '/odm_ui/<model>/delete', 'odm_ui@d_form', methods=('GET', 'POST'),
                   filters=auth_filter)
 
-    # Resources
-    lang.register_package(__name__)
-    tpl.register_package(__name__)
-
-    assetman.register_package(__name__)
-    assetman.t_js(__name__)
-
     # HTTP API handlers
     http_api.handle('GET', 'odm_ui/rows/<model>', _http_api_controllers.GetRows, 'odm_ui@get_rows')
+
+
+def plugin_install():
+    from plugins import assetman
+
+    plugin_load()
+    assetman.build(__name__)
