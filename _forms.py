@@ -65,7 +65,7 @@ class Modify(_form.Form):
 
         # Setting up the form through entity hook and global event
         entity.odm_ui_m_form_setup(self)
-        _events.fire('odm_ui@{}.m_form_setup'.format(self._model), frm=self, entity=entity)
+        _events.fire('odm_ui@m_form_setup.{}'.format(self._model), frm=self, entity=entity)
 
         if self._update_meta_title:
             _metatag.t_set('title', self.title)
@@ -83,7 +83,7 @@ class Modify(_form.Form):
         # Setting up form's widgets through entity hook and global event
         entity = dispense_entity(self._model, self._eid)
         entity.odm_ui_m_form_setup_widgets(self)
-        _events.fire('odm_ui@{}.m_form_setup_widgets'.format(self._model), frm=self, entity=entity)
+        _events.fire('odm_ui@m_form_setup_widgets.{}'.format(self._model), frm=self, entity=entity)
 
         if self.step == 1:
             # Entity model
