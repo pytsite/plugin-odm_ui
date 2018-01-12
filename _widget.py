@@ -74,7 +74,7 @@ class EntitySelect(_widget.select.Select):
 
         # Building items list
         for entity in finder.get():
-            self._items.append((entity.ref_str, self._get_caption(entity)))
+            self._items.append((entity.manual_ref, self._get_caption(entity)))
 
         return super()._get_element()
 

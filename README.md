@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 1.4 (2018-01-12)
+
+Support for `odm-1.4`.
+
+
 ### 1.3 (2018-01-02)
 
 Events names refactoring.
