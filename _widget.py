@@ -1,13 +1,13 @@
 """PytSite Object Document Mapper UI Plugin Widgets
 """
+__author__ = 'Alexander Shepetko'
+__email__ = 'a@shepetko.com'
+__license__ = 'MIT'
+
 from typing import List as _List, Callable as _Callable
 from bson.dbref import DBRef as _DBRef
 from pytsite import lang as _lang
 from plugins import widget as _widget, odm as _odm
-
-__author__ = 'Alexander Shepetko'
-__email__ = 'a@shepetko.com'
-__license__ = 'MIT'
 
 
 class EntitySelect(_widget.select.Select):

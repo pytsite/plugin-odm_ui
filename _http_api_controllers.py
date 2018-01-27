@@ -1,11 +1,11 @@
 """PytSite Object Document Mapper UI Plugin HTTP API Controllers
 """
-from pytsite import routing as _routing
-from . import _browser
-
 __author__ = 'Alexander Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
+
+from pytsite import routing as _routing
+from . import _browser
 
 
 class GetRows(_routing.Controller):

@@ -1,12 +1,12 @@
 """PytSite Object Document Mapper UI Plugin Models
 """
-from typing import Tuple as _Tuple, Dict as _Dict
-from pytsite import router as _router
-from plugins import widget as _widget, odm as _odm, odm_auth as _odm_auth, form as _form
-
 __author__ = 'Alexander Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
+
+from typing import Tuple as _Tuple, Dict as _Dict
+from pytsite import router as _router
+from plugins import widget as _widget, odm as _odm, odm_auth as _odm_auth, form as _form
 
 
 class UIEntity(_odm_auth.model.OwnedEntity):

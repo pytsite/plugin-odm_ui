@@ -1,12 +1,13 @@
 """PytSite Object Document Mapper UI Plugin Controllers
 """
-from pytsite import tpl as _tpl, router as _router, routing as _routing
-from plugins import assetman as _assetman, odm as _odm, admin as _admin
-from . import _api, _browser
 
 __author__ = 'Alexander Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
+
+from pytsite import tpl as _tpl, router as _router, routing as _routing
+from plugins import assetman as _assetman, odm as _odm, admin as _admin
+from . import _api, _browser
 
 
 class Browse(_routing.Controller):
@@ -25,9 +26,9 @@ class ModifyForm(_routing.Controller):
         model = self.arg('model')
         eid = self.arg('eid')
         try:
-            frm = _api.get_m_form(model, eid if eid != '0' else None)
-            return _admin.render_form(frm)
-
+            form = _api.get_m_form(model, eid if eid != '0' else None, hide_title=True)
+            form = _tpl.render('odm_ui@form', {'form': form})
+            return _admin.render(form)
         except _odm.error.EntityNotFound:
             raise self.not_found()
 
@@ -45,4 +46,4 @@ class DeleteForm(_routing.Controller):
         if not model or not ids:
             raise self.not_found()
 
-        return _admin.render_form(_api.get_d_form(model, ids))
+        return _admin.render(_tpl.render('odm_ui@form', {'form': _api.get_d_form(model, ids)}))

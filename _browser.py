@@ -1,14 +1,13 @@
 """PytSite Object Document Mapper UI Plugin Entities Browser
 """
-from typing import Callable as _Callable, Union as _Union
-from pytsite import router as _router, metatag as _metatag, lang as _lang, http as _http, html as _html
-from plugins import widget as _widget, auth as _auth, odm as _odm, permissions as _permissions, odm_auth as _odm_auth, \
-    http_api as _http_api
-from . import _api, _model
-
 __author__ = 'Alexander Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
+
+from typing import Callable as _Callable, Union as _Union
+from pytsite import router as _router, metatag as _metatag, lang as _lang, html as _html, http as _http
+from plugins import widget as _widget, auth as _auth, odm as _odm, permissions as _permissions, http_api as _http_api
+from . import _api, _model
 
 
 class Browser(_widget.misc.BootstrapTable):
@@ -22,21 +21,14 @@ class Browser(_widget.misc.BootstrapTable):
 
         self._model = model
         if not self._model:
-            raise RuntimeError('No model has been specified')
+            raise RuntimeError('No model specified')
 
         # Model class and mock instance
         self._model_class = _api.get_model_class(self._model)
         self._mock = _api.dispense_entity(self._model)
 
-        # Need at least one permission to show entities browser to user
-        allow = False
-        for p in self._mock.odm_auth_permissions():
-            if _odm_auth.check_permission(p, self._model):
-                allow = True
-                break
-
-        # Was at least one permission found?
-        if not allow:
+        # Check permissions
+        if not self._mock.odm_auth_check_permission('view'):
             raise _http.error.Forbidden()
 
         self._data_url = _http_api.url('odm_ui@get_rows', {'model': self._model})
@@ -124,7 +116,7 @@ class Browser(_widget.misc.BootstrapTable):
 
         # Permission based limitations if current user can work with only its OWN entities
         show_all = False
-        for perm_prefix in ('odm_auth.modify.', 'odm_auth.delete.'):
+        for perm_prefix in ('odm_auth@modify.', 'odm_auth@delete.'):
             perm_name = perm_prefix + self._model
             if _permissions.is_permission_defined(perm_name) and self._current_user.has_permission(perm_name):
                 show_all = True

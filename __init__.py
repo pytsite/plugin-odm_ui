@@ -4,31 +4,22 @@ __author__ = 'Alexander Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
-from pytsite import plugman as _plugman
-
-if _plugman.is_installed(__name__):
-    # Public API
-    from . import _widget as widget, _forms as forms, _model as model
-    from ._browser import Browser
-    from ._api import get_m_form, get_d_form, get_model_class
-
-
-def _register_assetman_resources():
-    from plugins import assetman
-
-    if not assetman.is_package_registered(__name__):
-        assetman.register_package(__name__)
-        assetman.t_js(__name__)
-
-    return assetman
+# Public API
+from . import _widget as widget, _forms as forms, _model as model
+from ._browser import Browser
+from ._api import get_m_form, get_d_form, get_model_class
 
 
 def plugin_install():
-    _register_assetman_resources().build(__name__)
+    from plugins import assetman
+    assetman.build(__name__)
 
 
 def plugin_load():
-    _register_assetman_resources()
+    from plugins import assetman
+
+    assetman.register_package(__name__)
+    assetman.t_js(__name__)
 
 
 def plugin_load_uwsgi():
@@ -41,17 +32,15 @@ def plugin_load_uwsgi():
     tpl.register_package(__name__)
 
     abp = admin.base_path()
-    auth_filter = admin.AdminAccessFilterController
 
     # Route: ODM browser page
-    router.handle(_controllers.Browse, abp + '/odm_ui/<model>', 'odm_ui@browse', filters=auth_filter)
+    router.handle(_controllers.Browse, abp + '/odm_ui/<model>', 'odm_ui@browse')
 
     # Route: 'create/modify' ODM entity form display
-    router.handle(_controllers.ModifyForm, abp + '/odm_ui/<model>/modify/<eid>', 'odm_ui@m_form', filters=auth_filter)
+    router.handle(_controllers.ModifyForm, abp + '/odm_ui/<model>/modify/<eid>', 'odm_ui@m_form')
 
     # Route: 'delete' form display
-    router.handle(_controllers.DeleteForm, abp + '/odm_ui/<model>/delete', 'odm_ui@d_form', methods=('GET', 'POST'),
-                  filters=auth_filter)
+    router.handle(_controllers.DeleteForm, abp + '/odm_ui/<model>/delete', 'odm_ui@d_form', methods=('GET', 'POST'))
 
     # HTTP API handlers
     http_api.handle('GET', 'odm_ui/rows/<model>', _http_api_controllers.GetRows, 'odm_ui@get_rows')

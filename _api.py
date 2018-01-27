@@ -1,12 +1,12 @@
 """PytSite Object Document Mapper UI Plugin API Functions
 """
-from typing import Iterable as _Iterable, Type as _Type
-from plugins import odm as _odm, odm_auth as _odm_auth, form as _form
-from . import _model, _forms
-
 __author__ = 'Alexander Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
+
+from typing import Iterable as _Iterable, Type as _Type
+from plugins import odm as _odm, odm_auth as _odm_auth, form as _form
+from . import _model, _forms
 
 
 def get_m_form(model: str, eid=None, update_meta_title: bool = True, **kwargs) -> _forms.Modify:

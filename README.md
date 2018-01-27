@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 1.5 (2018-01-27)
+
+Support for `admin-1.3`, `auth-1.3`.
+
+
 ### 1.4 (2018-01-12)
 
 Support for `odm-1.4`.

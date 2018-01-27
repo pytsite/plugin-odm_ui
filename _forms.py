@@ -1,13 +1,13 @@
 """PytSite Object Document Mapper UI Plugin Forms
 """
+__author__ = 'Alexander Shepetko'
+__email__ = 'a@shepetko.com'
+__license__ = 'MIT'
+
 from pytsite import lang as _lang, http as _http, events as _events, metatag as _metatag, \
     router as _router, html as _html, logger as _logger, errors as _errors
 from plugins import widget as _widget, form as _form, odm as _odm, odm_auth as _odm_auth
 from . import _model
-
-__author__ = 'Alexander Shepetko'
-__email__ = 'a@shepetko.com'
-__license__ = 'MIT'
 
 
 class Modify(_form.Form):
@@ -16,7 +16,7 @@ class Modify(_form.Form):
         """
         self._model = kwargs.get('model')
         if not self._model:
-            raise ValueError('Model is not specified.')
+            raise ValueError('Model is not specified')
 
         self._eid = kwargs.get('eid')
         self._update_meta_title = kwargs.get('update_meta_title', True)
@@ -224,7 +224,7 @@ class Delete(MassAction):
         # Check permissions
         for eid in self._eids:
             if not (_odm_auth.check_permission('delete', self._model) or
-                        _odm_auth.check_permission('delete_own', self._model, eid)):
+                    _odm_auth.check_permission('delete_own', self._model, eid)):
                 raise _http.error.Forbidden()
 
         # Page title
