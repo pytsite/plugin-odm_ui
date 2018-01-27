@@ -16,7 +16,7 @@
     "plugins": [
       "admin>=1.3",
       "assetman",
-      "auth>=1.3",
+      "auth>=1.8",
       "auth_ui",
       "form>=1.3",
       "http_api",
