@@ -10,11 +10,6 @@ from ._browser import Browser
 from ._api import get_m_form, get_d_form, get_model_class
 
 
-def plugin_install():
-    from plugins import assetman
-    assetman.build(__name__)
-
-
 def plugin_load():
     from plugins import assetman
 
@@ -22,9 +17,14 @@ def plugin_load():
     assetman.t_js(__name__)
 
 
+def plugin_install():
+    from plugins import assetman
+    assetman.build(__name__)
+
+
 def plugin_load_uwsgi():
     from pytsite import tpl, lang, router
-    from plugins import admin, http_api
+    from plugins import admin, http_api, auth_ui
     from . import _controllers, _http_api_controllers
 
     # Resources
@@ -34,13 +34,16 @@ def plugin_load_uwsgi():
     abp = admin.base_path()
 
     # Route: ODM browser page
-    router.handle(_controllers.Browse, abp + '/odm_ui/<model>', 'odm_ui@browse')
+    router.handle(_controllers.Browse, abp + '/odm_ui/<model>', 'odm_ui@browse',
+                  filters=auth_ui.AuthFilterController)
 
     # Route: 'create/modify' ODM entity form display
-    router.handle(_controllers.ModifyForm, abp + '/odm_ui/<model>/modify/<eid>', 'odm_ui@m_form')
+    router.handle(_controllers.ModifyForm, abp + '/odm_ui/<model>/modify/<eid>', 'odm_ui@m_form',
+                  filters=auth_ui.AuthFilterController)
 
     # Route: 'delete' form display
-    router.handle(_controllers.DeleteForm, abp + '/odm_ui/<model>/delete', 'odm_ui@d_form', methods=('GET', 'POST'))
+    router.handle(_controllers.DeleteForm, abp + '/odm_ui/<model>/delete', 'odm_ui@d_form', methods=('GET', 'POST'),
+                  filters=auth_ui.AuthFilterController)
 
     # HTTP API handlers
     http_api.handle('GET', 'odm_ui/rows/<model>', _http_api_controllers.GetRows, 'odm_ui@get_rows')

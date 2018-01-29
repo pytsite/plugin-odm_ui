@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 1.5.1 (2018-01-29)
+
+Missing authentication step fixed.
+
+
 ### 1.5 (2018-01-27)
 
 Support for `admin-1.3`, `auth-1.8`.
