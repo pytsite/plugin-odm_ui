@@ -5,7 +5,8 @@ __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
 from typing import Callable as _Callable, Union as _Union
-from pytsite import router as _router, metatag as _metatag, lang as _lang, html as _html, http as _http
+from pytsite import router as _router, metatag as _metatag, lang as _lang, html as _html, http as _http, \
+    events as _events
 from plugins import widget as _widget, auth as _auth, odm as _odm, permissions as _permissions, http_api as _http_api
 from . import _api, _model
 
@@ -78,15 +79,24 @@ class Browser(_widget.misc.BootstrapTable):
         # Call model's class to perform setup tasks
         self._model_class.odm_ui_browser_setup(self)
 
+        # Notify external events listeners
+        _events.fire('odm_ui@browser_setup_{}'.format(self._model), browser=self)
+
         # Head columns
         if not self.data_fields:
             raise RuntimeError("No data fields are defined.")
 
     @property
     def model(self) -> str:
-        """Get browser entities model.
+        """Get browser entities model
         """
         return self._model
+
+    @property
+    def mock(self) -> _model.UIEntity:
+        """Get entity mock
+        """
+        return self._mock
 
     @property
     def finder_adjust(self) -> _Callable:

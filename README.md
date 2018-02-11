@@ -4,6 +4,12 @@
 ## Changelog
 
 
+### 1.6 (2018-02-11)
+
+- Support for PytSite-7.9.
+- New event `odm_ui@browser_setup_{model}` added.
+
+
 ### 1.5.1 (2018-01-29)
 
 Missing authentication step fixed.

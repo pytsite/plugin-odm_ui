@@ -1,6 +1,6 @@
 {
   "name": "odm_ui",
-  "version": "1.5.1",
+  "version": "1.6",
   "description": {
     "en": "Object Document Mapper UI",
     "ru": "Object Document Mapper UI",
@@ -13,6 +13,7 @@
     "url": "https://shepetko.com"
   },
   "requires": {
+    "pytsite": ">=7.9",
     "plugins": [
       "admin>=1.3",
       "assetman",
