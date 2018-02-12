@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 1.6.1 (2018-02-12)
+
+Typo fixed.
+
+
 ### 1.6 (2018-02-11)
 
 - Support for PytSite-7.9.

@@ -80,7 +80,7 @@ class Browser(_widget.misc.BootstrapTable):
         self._model_class.odm_ui_browser_setup(self)
 
         # Notify external events listeners
-        _events.fire('odm_ui@browser_setup_{}'.format(self._model), browser=self)
+        _events.fire('odm_ui@browser_setup.{}'.format(self._model), browser=self)
 
         # Head columns
         if not self.data_fields:
