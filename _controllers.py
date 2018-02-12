@@ -6,14 +6,12 @@ __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
 from pytsite import tpl as _tpl, router as _router, routing as _routing
-from plugins import assetman as _assetman, odm as _odm, admin as _admin
+from plugins import odm as _odm, admin as _admin
 from . import _api, _browser
 
 
 class Browse(_routing.Controller):
     def exec(self) -> str:
-        _assetman.preload('odm_ui@js/odm-ui-browser.js')
-
         return _admin.render(_tpl.render('odm_ui@browser', {
             'table': _browser.Browser(self.arg('model')).render()
         }))

@@ -84,7 +84,10 @@ class Browser(_widget.misc.BootstrapTable):
 
         # Head columns
         if not self.data_fields:
-            raise RuntimeError("No data fields are defined.")
+            raise RuntimeError("No data fields are defined")
+
+        # JS code
+        self._js_module = 'odm-ui-browser'
 
     @property
     def model(self) -> str:
@@ -109,7 +112,7 @@ class Browser(_widget.misc.BootstrapTable):
     def _default_finder_adjust(self, finder: _odm.Finder):
         pass
 
-    def _build_head_row(self, row: _html.Tr):
+    def _alter_head_row(self, row: _html.Tr):
         # Actions column
         if self._model_class.odm_ui_entity_actions_enabled():
             row.append(_html.Th(_lang.t('odm_ui@actions'), data_field='__actions'))
@@ -132,6 +135,7 @@ class Browser(_widget.misc.BootstrapTable):
                 show_all = True
                 break
 
+        # Add constraints to the finder if user cannot see all records
         if not show_all:
             if finder.mock.has_field('author'):
                 finder.eq('author', self._current_user.uid)
@@ -161,19 +165,26 @@ class Browser(_widget.misc.BootstrapTable):
         cursor = finder.skip(offset).get(limit)
         for entity in cursor:
             row = entity.odm_ui_browser_row()
-
-            if row is None:
-                continue
+            _events.fire('odm_ui@browser_row.{}'.format(self._model), entity=entity, row=row)
 
             if not row:
-                raise RuntimeError("'ui_browser_get_row()' returned nothing.")
-            if len(row) != len(self.data_fields):
-                raise RuntimeError("'ui_browser_get_row()' returned invalid number of cells.")
+                continue
 
-            # Data TDs
-            cell = {}
-            for f_name, cell_content in zip([f[0] for f in self._data_fields], row):
-                cell[f_name] = cell_content
+            # Build row's cells
+            cells = {}
+            if isinstance(row, (list, tuple)):
+                if len(row) != len(self.data_fields):
+                    raise ValueError(
+                        '{}.odm_ui_browser_row() returns invalid number of cells'.format(entity.__class__.__name__)
+                    )
+                for f_name, cell_content in zip([df[0] for df in self._data_fields], row):
+                    cells[f_name] = cell_content
+            elif isinstance(row, dict):
+                for df in self._data_fields:
+                    cells[df[0]] = row.get(df[0], '&nbsp;')
+            else:
+                raise TypeError('{}.odm_ui_browser_row() must return list, tuple or dict, got {}'.
+                                format(entity.__class__.__name__, type(row)))
 
             # Action buttons
             if self._model_class.odm_ui_entity_actions_enabled():
@@ -192,9 +203,9 @@ class Browser(_widget.misc.BootstrapTable):
                 if not len(actions.children):
                     actions.set_attr('css', actions.get_attr('css') + ' empty')
 
-                cell['__actions'] = actions.render()
+                cells['__actions'] = actions.render()
 
-            r['rows'].append(cell)
+            r['rows'].append(cells)
 
         return r
 

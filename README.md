@@ -3,6 +3,12 @@
 
 ## Changelog
 
+### 1.7 (2018-02-12)
+
+- Support for dictionary-based data fields in `Browser`.
+- New event `'odm_ui@browser_row.{model}` added.
+- JS and CSS fixed.
+
 
 ### 1.6.1 (2018-02-12)
 
@@ -12,7 +18,7 @@ Typo fixed.
 ### 1.6 (2018-02-11)
 
 - Support for PytSite-7.9.
-- New event `odm_ui@browser_setup_{model}` added.
+- New event `odm_ui@browser_setup.{model}` added.
 
 
 ### 1.5.1 (2018-01-29)
