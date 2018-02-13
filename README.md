@@ -3,6 +3,12 @@
 
 ## Changelog
 
+
+### 1.7.1 (2018-02-13)
+
+Fixed browser's permissions issue.
+
+
 ### 1.7 (2018-02-12)
 
 - Support for dictionary-based data fields in `Browser`.

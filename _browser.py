@@ -127,20 +127,26 @@ class Browser(_widget.misc.BootstrapTable):
         finder = _odm.find(self._model)
         self._finder_adjust(finder)
 
-        # Permission based limitations if current user can work with only its OWN entities
-        show_all = False
-        for perm_prefix in ('odm_auth@modify.', 'odm_auth@delete.'):
-            perm_name = perm_prefix + self._model
-            if _permissions.is_permission_defined(perm_name) and self._current_user.has_permission(perm_name):
-                show_all = True
-                break
+        # Admins and developers has full access
+        show_all = self._current_user.has_role(['admin', 'dev'])
 
-        # Add constraints to the finder if user cannot see all records
+        # Check if the current user is not admin, but have permission-based full access
         if not show_all:
-            if finder.mock.has_field('author'):
-                finder.eq('author', self._current_user.uid)
-            elif finder.mock.has_field('owner'):
-                finder.eq('owner', self._current_user.uid)
+            for perm_prefix in ('odm_auth@modify.', 'odm_auth@delete.'):
+                perm_name = perm_prefix + self._model
+                if _permissions.is_permission_defined(perm_name) and self._current_user.has_permission(perm_name):
+                    show_all = True
+                    break
+
+        # Check if the current user does not have full access, but have access to its own entities
+        if not show_all and (finder.mock.has_field('author') or finder.mock.has_field('owner')):
+            for perm_prefix in ('odm_auth@modify_own.', 'odm_auth@delete_own.'):
+                perm_name = perm_prefix + self._model
+                if _permissions.is_permission_defined(perm_name) and self._current_user.has_permission(perm_name):
+                    if finder.mock.has_field('author'):
+                        finder.eq('author', self._current_user.uid)
+                    elif finder.mock.has_field('owner'):
+                        finder.eq('owner', self._current_user.uid)
 
         # Search
         if search:
