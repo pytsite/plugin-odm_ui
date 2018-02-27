@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 1.8.3 (2018-02-27)
+
+`Browser.remove_data_field()` method restored.
+
+
 ### 1.8.2 (2018-02-27)
 
 Version number fixed.

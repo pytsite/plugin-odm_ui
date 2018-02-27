@@ -110,6 +110,9 @@ class Browser:
     def insert_data_field(self, name: str, title: str = None, sortable: bool = True, pos: int = None):
         self._widget.insert_data_field(name, title, sortable, pos)
 
+    def remove_data_field(self, name: str):
+        self._widget.remove_data_field(name)
+
     def _default_finder_adjust(self, finder: _odm.Finder):
         pass
 
@@ -156,7 +159,7 @@ class Browser:
         r['total'] = finder.count()
 
         # Sort
-        sort_order =  _odm.I_DESC if sort_order in (-1, 'desc') else _odm.I_ASC
+        sort_order = _odm.I_DESC if sort_order in (-1, 'desc') else _odm.I_ASC
         if sort_field and finder.mock.has_field(sort_field):
             finder.sort([(sort_field, sort_order)])
         elif self.default_sort_field:
