@@ -4,7 +4,12 @@
 ## Changelog
 
 
-### 1.6 (2018-02-27)
+### 1.8.1 (2018-02-27)
+
+Rows count checking issue fixed.
+
+
+### 1.8 (2018-02-27)
 
 Support for entity trees.
 

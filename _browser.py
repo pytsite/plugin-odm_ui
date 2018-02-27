@@ -181,7 +181,10 @@ class Browser:
             }
 
             if isinstance(row, (list, tuple)):
-                if len(row) != len(self.data_fields):
+                expected_row_length = len(self.data_fields)
+                if self._model_class.odm_ui_entity_actions_enabled():
+                    expected_row_length -= 1
+                if len(row) != expected_row_length:
                     raise ValueError(
                         '{}.odm_ui_browser_row() returns invalid number of cells'.format(entity.__class__.__name__)
                     )
