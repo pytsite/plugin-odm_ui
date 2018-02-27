@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 1.6 (2018-02-27)
+
+Support for entity trees.
+
+
 ### 1.7.1 (2018-02-13)
 
 Fixed browser's permissions issue.

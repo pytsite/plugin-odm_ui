@@ -4,7 +4,7 @@ __author__ = 'Alexander Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
-from typing import Tuple as _Tuple, Dict as _Dict
+from typing import Tuple as _Tuple, Dict as _Dict, Type as _Type
 from pytsite import router as _router
 from plugins import widget as _widget, odm as _odm, odm_auth as _odm_auth, form as _form
 
@@ -12,6 +12,9 @@ from plugins import widget as _widget, odm as _odm, odm_auth as _odm_auth, form 
 class UIEntity(_odm_auth.model.OwnedEntity):
     """ODM entity with UI related methods.
     """
+    @classmethod
+    def odm_ui_browser_widget_class(cls) -> _Type[_widget.misc.DataTable]:
+        return _widget.misc.BootstrapTable
 
     @classmethod
     def odm_ui_browser_setup(cls, browser):

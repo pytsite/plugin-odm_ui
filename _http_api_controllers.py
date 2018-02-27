@@ -4,7 +4,7 @@ __author__ = 'Alexander Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
-from pytsite import routing as _routing
+from pytsite import routing as _routing, formatters as _formatters, validation as _validation
 from . import _browser
 
 
@@ -12,13 +12,18 @@ class GetRows(_routing.Controller):
     """Get browser rows
     """
 
-    def exec(self) -> dict:
-        offset = int(self.arg('offset', 0))
-        limit = int(self.arg('limit', 0))
-        sort_field = self.arg('sort')
-        sort_order = self.arg('order')
-        search = self.arg('search')
-        browser = _browser.Browser(self.arg('model'))
-        rows = browser.get_rows(offset, limit, sort_field, sort_order, search)
+    def __init__(self):
+        super().__init__()
 
-        return rows
+        self.args.add_formatter('offset', _formatters.PositiveInt())
+        self.args.add_formatter('limit', _formatters.PositiveInt())
+        self.args.add_validation('order', _validation.rule.Choice(options=['asc', 'desc']))
+
+    def exec(self) -> dict:
+        return _browser.Browser(self.arg('model')).get_rows(
+            self.arg('offset', 0),
+            self.arg('limit', 0),
+            self.arg('sort'),
+            self.arg('order', 'asc'),
+            self.arg('search')
+        )

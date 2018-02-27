@@ -7,74 +7,45 @@ __license__ = 'MIT'
 from typing import Callable as _Callable, Union as _Union
 from pytsite import router as _router, metatag as _metatag, lang as _lang, html as _html, http as _http, \
     events as _events
-from plugins import widget as _widget, auth as _auth, odm as _odm, permissions as _permissions, http_api as _http_api
+from plugins import widget as _widget, auth as _auth, odm as _odm, permissions as _permissions, http_api as _http_api, \
+    assetman as _assetman
 from . import _api, _model
 
 
-class Browser(_widget.misc.BootstrapTable):
-    """ODM Entities Browser.
+class Browser:
+    """ODM Entities Browser
     """
 
     def __init__(self, model: str):
-        """Init.
+        """Init
         """
-        super().__init__('odm-ui-browser-' + model)
-
-        self._model = model
-        if not self._model:
+        if not model:
             raise RuntimeError('No model specified')
 
-        # Model class and mock instance
+        # Model
+        self._model = model
+
+        # Model class
         self._model_class = _api.get_model_class(self._model)
+
+        # Entity mock
         self._mock = _api.dispense_entity(self._model)
+
+        # Widget
+        widget_class = self._model_class.odm_ui_browser_widget_class()
+        if not (issubclass(widget_class, _widget.misc.DataTable)):
+            raise TypeError('Subclass of {} expected, got'.format(_widget.misc.DataTable, widget_class))
+        self._widget = widget_class(
+            uid='odm-ui-browser-' + model,
+            data_url=_http_api.url('odm_ui@get_rows', {'model': self._model}),
+        )
 
         # Check permissions
         if not self._mock.odm_auth_check_permission('view'):
             raise _http.error.Forbidden()
 
-        self._data_url = _http_api.url('odm_ui@get_rows', {'model': self._model})
         self._current_user = _auth.get_current_user()
         self._finder_adjust = self._default_finder_adjust
-
-        # Browser title
-        if not _router.request().is_xhr:
-            self._title = self._model_class.t('odm_ui_browser_title_' + self._model)
-            _metatag.t_set('title', self._title)
-            _metatag.t_set('description', '')
-
-            # 'Create' toolbar button
-            if self._mock.odm_auth_check_permission('create') and self._mock.odm_ui_creation_allowed():
-                create_form_url = _router.rule_url('odm_ui@m_form', {
-                    'model': self._model,
-                    'eid': '0',
-                    '__redirect': _router.current_url(),
-                })
-                title = _lang.t('odm_ui@create')
-                btn = _html.A(href=create_form_url, css='btn btn-default add-button', title=title)
-                btn.append(_html.I(css='fa fa-fw fa-plus'))
-                self._toolbar.append(btn)
-                self._toolbar.append(_html.Span('&nbsp;'))
-
-            # 'Delete' toolbar button
-            if self._mock.odm_auth_check_permission('delete') and self._mock.odm_ui_deletion_allowed():
-                delete_form_url = _router.rule_url('odm_ui@d_form', {'model': self._model})
-                title = _lang.t('odm_ui@delete_selected')
-                btn = _html.A(href=delete_form_url, css='hidden btn btn-danger mass-action-button', title=title)
-                btn.append(_html.I(css='fa fa-fw fa-remove'))
-                self._toolbar.append(btn)
-                self._toolbar.append(_html.Span('&nbsp;'))
-
-            # Additional toolbar buttons
-            for btn_data in self._model_class.odm_ui_browser_mass_action_buttons():
-                ep = btn_data.get('ep')
-                url = _router.rule_url(ep) if ep else '#'
-                css = 'btn btn-{} mass-action-button'.format(btn_data.get('color', 'default'))
-                icon = 'fa fa-fw fa-' + btn_data.get('icon', 'question')
-                button = _html.A(href=url, css=css, title=btn_data.get('title'))
-                if icon:
-                    button.append(_html.I(css=icon))
-                self.toolbar.append(button)
-                self._toolbar.append(_html.Span('&nbsp;'))
 
         # Call model's class to perform setup tasks
         self._model_class.odm_ui_browser_setup(self)
@@ -82,12 +53,15 @@ class Browser(_widget.misc.BootstrapTable):
         # Notify external events listeners
         _events.fire('odm_ui@browser_setup.{}'.format(self._model), browser=self)
 
-        # Head columns
+        # Check if the model specified data fields
         if not self.data_fields:
-            raise RuntimeError("No data fields are defined")
+            raise RuntimeError('No data fields was defined')
 
-        # JS code
-        self._js_module = 'odm-ui-browser'
+        # Actions column
+        if self._model_class.odm_ui_entity_actions_enabled():
+            self.insert_data_field('_actions', 'odm_ui@actions', False)
+
+        _assetman.preload('odm_ui@css/odm-ui-browser.css')
 
     @property
     def model(self) -> str:
@@ -109,19 +83,45 @@ class Browser(_widget.misc.BootstrapTable):
     def finder_adjust(self, func: _Callable):
         self._finder_adjust = func
 
+    @property
+    def data_fields(self) -> _Union[list, tuple]:
+        return self._widget.data_fields
+
+    @data_fields.setter
+    def data_fields(self, value: _Union[list, tuple]):
+        self._widget.data_fields = value
+
+    @property
+    def default_sort_field(self) -> str:
+        return self._widget.default_sort_field
+
+    @default_sort_field.setter
+    def default_sort_field(self, value: str):
+        self._widget.default_sort_field = value
+
+    @property
+    def default_sort_order(self) -> str:
+        return self._widget.default_sort_order
+
+    @default_sort_order.setter
+    def default_sort_order(self, value: str):
+        self._widget.default_sort_order = value
+
+    def insert_data_field(self, name: str, title: str = None, sortable: bool = True, pos: int = None):
+        self._widget.insert_data_field(name, title, sortable, pos)
+
     def _default_finder_adjust(self, finder: _odm.Finder):
         pass
-
-    def _alter_head_row(self, row: _html.Tr):
-        # Actions column
-        if self._model_class.odm_ui_entity_actions_enabled():
-            row.append(_html.Th(_lang.t('odm_ui@actions'), data_field='__actions'))
 
     def get_rows(self, offset: int = 0, limit: int = 0, sort_field: str = None, sort_order: _Union[int, str] = None,
                  search: str = None) -> dict:
         """Get browser rows.
         """
         r = {'total': 0, 'rows': []}
+
+        # Sort order
+        if sort_order is None:
+            sort_order = self.default_sort_order
 
         # Setup finder
         finder = _odm.find(self._model)
@@ -156,16 +156,14 @@ class Browser(_widget.misc.BootstrapTable):
         r['total'] = finder.count()
 
         # Sort
+        sort_order =  _odm.I_DESC if sort_order in (-1, 'desc') else _odm.I_ASC
         if sort_field and finder.mock.has_field(sort_field):
-            if isinstance(sort_order, int):
-                sort_order = _odm.I_DESC if sort_order < 0 else _odm.I_ASC
-            elif isinstance(sort_order, str):
-                sort_order = _odm.I_DESC if sort_order.lower() == 'desc' else _odm.I_ASC
-            else:
-                sort_order = _odm.I_ASC
             finder.sort([(sort_field, sort_order)])
-        elif self._default_sort_field:
-            finder.sort([(self._default_sort_field, self._default_sort_order)])
+        elif self.default_sort_field:
+            finder.sort([(self.default_sort_field, sort_order)])
+
+        # Get root elements first
+        finder.add_sort('_parent', pos=0)
 
         # Iterate over result and get content for table rows
         cursor = finder.skip(offset).get(limit)
@@ -177,17 +175,21 @@ class Browser(_widget.misc.BootstrapTable):
                 continue
 
             # Build row's cells
-            cells = {}
+            fields_data = {
+                '__id': str(entity.id),
+                '__parent': str(entity.parent.id) if entity.parent else None,
+            }
+
             if isinstance(row, (list, tuple)):
                 if len(row) != len(self.data_fields):
                     raise ValueError(
                         '{}.odm_ui_browser_row() returns invalid number of cells'.format(entity.__class__.__name__)
                     )
-                for f_name, cell_content in zip([df[0] for df in self._data_fields], row):
-                    cells[f_name] = cell_content
+                for f_name, cell_content in zip([df[0] for df in self.data_fields], row):
+                    fields_data[f_name] = cell_content
             elif isinstance(row, dict):
-                for df in self._data_fields:
-                    cells[df[0]] = row.get(df[0], '&nbsp;')
+                for df in self.data_fields:
+                    fields_data[df[0]] = row.get(df[0], '&nbsp;')
             else:
                 raise TypeError('{}.odm_ui_browser_row() must return list, tuple or dict, got {}'.
                                 format(entity.__class__.__name__, type(row)))
@@ -209,9 +211,9 @@ class Browser(_widget.misc.BootstrapTable):
                 if not len(actions.children):
                     actions.set_attr('css', actions.get_attr('css') + ' empty')
 
-                cells['__actions'] = actions.render()
+                fields_data['_actions'] = actions.render()
 
-            r['rows'].append(cells)
+            r['rows'].append(fields_data)
 
         return r
 
@@ -248,3 +250,45 @@ class Browser(_widget.misc.BootstrapTable):
             group.append(_html.TagLessElement('&nbsp;'))
 
         return group
+
+    def render(self) -> str:
+
+        # Browser title
+        _metatag.t_set('title', self._model_class.t('odm_ui_browser_title_' + self._model))
+        _metatag.t_set('description', '')
+
+        # 'Create' toolbar button
+        if self._mock.odm_auth_check_permission('create') and self._mock.odm_ui_creation_allowed():
+            create_form_url = _router.rule_url('odm_ui@m_form', {
+                'model': self._model,
+                'eid': '0',
+                '__redirect': _router.current_url(),
+            })
+            title = _lang.t('odm_ui@create')
+            btn = _html.A(href=create_form_url, css='btn btn-default add-button', title=title)
+            btn.append(_html.I(css='fa fa-fw fa-plus'))
+            self._widget.toolbar.append(btn)
+            self._widget.toolbar.append(_html.Span('&nbsp;'))
+
+        # 'Delete' toolbar button
+        if self._mock.odm_auth_check_permission('delete') and self._mock.odm_ui_deletion_allowed():
+            delete_form_url = _router.rule_url('odm_ui@d_form', {'model': self._model})
+            title = _lang.t('odm_ui@delete_selected')
+            btn = _html.A(href=delete_form_url, css='hidden btn btn-danger mass-action-button', title=title)
+            btn.append(_html.I(css='fa fa-fw fa-remove'))
+            self._widget.toolbar.append(btn)
+            self._widget.toolbar.append(_html.Span('&nbsp;'))
+
+        # Additional toolbar buttons
+        for btn_data in self._model_class.odm_ui_browser_mass_action_buttons():
+            ep = btn_data.get('ep')
+            url = _router.rule_url(ep) if ep else '#'
+            css = 'btn btn-{} mass-action-button'.format(btn_data.get('color', 'default'))
+            icon = 'fa fa-fw fa-' + btn_data.get('icon', 'question')
+            button = _html.A(href=url, css=css, title=btn_data.get('title'))
+            if icon:
+                button.append(_html.I(css=icon))
+            self._widget.toolbar.append(button)
+            self._widget.toolbar.append(_html.Span('&nbsp;'))
+
+        return self._widget.render()

@@ -14,9 +14,7 @@ def plugin_load():
     from plugins import assetman
 
     assetman.register_package(__name__)
-    assetman.js_module('odm-ui-browser', __name__ + '@js/odm-ui-browser')
     assetman.t_less(__name__)
-    assetman.t_js(__name__)
 
 
 def plugin_install():

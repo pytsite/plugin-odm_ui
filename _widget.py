@@ -4,7 +4,7 @@ __author__ = 'Alexander Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
-from typing import List as _List, Callable as _Callable
+from typing import List as _List, Tuple as _Tuple, Callable as _Callable, Iterable as _Iterable
 from bson.dbref import DBRef as _DBRef
 from pytsite import lang as _lang
 from plugins import widget as _widget, odm as _odm
@@ -17,6 +17,26 @@ class EntitySelect(_widget.select.Select):
     def __init__(self, uid: str, **kwargs):
         """Init.
         """
+        if 'exclude' in kwargs and kwargs['exclude']:
+            if isinstance(kwargs['exclude'], _odm.Entity):
+                kwargs['exclude'] = [kwargs['exclude'].manual_ref]
+            elif isinstance(kwargs['exclude'], (list, tuple)):
+                ex = []
+                for item in kwargs['exclude']:
+                    if isinstance(item, _odm.Entity):
+                        ex.append(item.manual_ref)
+                    elif isinstance(item, str):
+                        ex.append(item)
+                    else:
+                        raise TypeError('Unsupported type: {}'.format(type(item)))
+
+                kwargs['exclude'] = ex
+
+            if kwargs.get('exclude_descendants'):
+                for ref in kwargs['exclude'].copy():
+                    for descendant in _odm.get_by_ref(ref).descendants:
+                        kwargs['exclude'].append(descendant.manual_ref)
+
         super().__init__(uid, **kwargs)
 
         self._model = kwargs.get('model')
@@ -28,6 +48,7 @@ class EntitySelect(_widget.select.Select):
             raise ValueError('Caption field is not specified')
 
         self._sort_field = kwargs.get('sort_field', self._caption_field)
+        self._sort_order = kwargs.get('sort_order', _odm.I_ASC)
         self._finder_adjust = kwargs.get('finder_adjust')  # type: _Callable[[_odm.Finder], None]
         self._caption_adjust = kwargs.get('caption_adjust')  # type: _Callable[[_odm.Finder], None]
 
@@ -42,7 +63,7 @@ class EntitySelect(_widget.select.Select):
     def set_val(self, value, **kwargs):
         """Set value of the widget.
         """
-        if isinstance(value, str) and not value:
+        if value == '':
             value = None
         elif isinstance(value, _odm.model.Entity):
             value = value.model + ':' + str(value.id)
@@ -53,7 +74,8 @@ class EntitySelect(_widget.select.Select):
         return super().set_val(value, **kwargs)
 
     def _get_finder(self) -> _odm.Finder:
-        finder = _odm.find(self._model).sort([(self._sort_field, _odm.I_ASC)])
+        finder = _odm.find(self._model).sort([(self._sort_field, self._sort_order)])
+
         if self._finder_adjust:
             self._finder_adjust(finder)
 
@@ -64,17 +86,26 @@ class EntitySelect(_widget.select.Select):
         if self._caption_adjust:
             caption = self._caption_adjust(caption)
 
+        if entity.depth:
+            caption = '-' * entity.depth + ' ' + caption
+
         return caption
 
-    def _get_element(self, **kwargs):
-        """Render the widget.
-        :param **kwargs:
-        """
-        finder = self._get_finder()
+    def _build_items_tree(self, entities: _Iterable[_odm.Entity], _result: list = None) -> _List[_Tuple[str, str]]:
+        if _result is None:
+            _result = []
 
-        # Building items list
-        for entity in finder.get():
-            self._items.append((entity.manual_ref, self._get_caption(entity)))
+        for entity in entities:
+            _result.append((entity.manual_ref, self._get_caption(entity)))
+            self._build_items_tree(entity.children, _result)
+
+        return _result
+
+    def _get_element(self, **kwargs):
+        """Render the widget
+        """
+        for item in self._build_items_tree([entity for entity in self._get_finder().eq('_parent', None)]):
+            self._items.append((item[0], item[1]))
 
         return super()._get_element()
 
