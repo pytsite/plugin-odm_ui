@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 1.8.2 (2018-02-27)
+
+Version number fixed.
+
+
 ### 1.8.1 (2018-02-27)
 
 Rows count checking issue fixed.
