@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 1.8.5 (2018-03-05)
+
+Entity state checking fixed in `widget.EntitySelect`.
+
+
 ### 1.8.4 (2018-03-05)
 
 Argument `exclude_descendants` of `widget.EntitySelect`'s constructor
