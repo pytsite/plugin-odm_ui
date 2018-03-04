@@ -32,7 +32,7 @@ class EntitySelect(_widget.select.Select):
 
                 kwargs['exclude'] = ex
 
-            if kwargs.get('exclude_descendants'):
+            if kwargs.get('exclude_descendants', True):
                 for ref in kwargs['exclude'].copy():
                     for descendant in _odm.get_by_ref(ref).descendants:
                         kwargs['exclude'].append(descendant.manual_ref)

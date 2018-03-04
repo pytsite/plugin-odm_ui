@@ -4,6 +4,12 @@
 ## Changelog
 
 
+### 1.8.4 (2018-03-05)
+
+Argument `exclude_descendants` of `widget.EntitySelect`'s constructor
+is now `True` by default.
+
+
 ### 1.8.3 (2018-02-27)
 
 `Browser.remove_data_field()` method restored.
