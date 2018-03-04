@@ -19,7 +19,7 @@ class EntitySelect(_widget.select.Select):
         """
         if 'exclude' in kwargs and kwargs['exclude']:
             if isinstance(kwargs['exclude'], _odm.Entity):
-                if not not kwargs['exclude'].is_new:
+                if not kwargs['exclude'].is_new:
                     kwargs['exclude'] = [kwargs['exclude'].manual_ref]
             elif isinstance(kwargs['exclude'], str):
                 kwargs['exclude'] = [kwargs['exclude']]

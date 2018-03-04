@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 1.8.6 (2018-03-05)
+
+Typo fixed.
+
+
 ### 1.8.5 (2018-03-05)
 
 Entity state checking fixed in `widget.EntitySelect`.
