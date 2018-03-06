@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 1.8.8 (2018-03-07)
+
+"Actions' column visibility conditions fixed.
+
+
 ### 1.8.7 (2018-03-05)
 
 Entity state checking fixed in `widget.EntitySelect`.

@@ -6,8 +6,9 @@ __license__ = 'MIT'
 
 # Public API
 from . import _widget as widget, _forms as forms, _model as model
-from ._browser import Browser
 from ._api import get_m_form, get_d_form, get_model_class
+from ._browser import Browser
+from ._model import UIEntity
 
 
 def plugin_load():

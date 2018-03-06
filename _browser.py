@@ -92,11 +92,14 @@ class Browser:
         self._widget.data_fields = value
 
     @property
-    def default_sort_field(self) -> str:
-        return self._widget.default_sort_field
+    def default_sort_field(self) -> int:
+        return _odm.I_DESC if self._widget.default_sort_field == 'desc' else _odm.I_ASC
 
     @default_sort_field.setter
-    def default_sort_field(self, value: str):
+    def default_sort_field(self, value: _Union[int, str]):
+        if isinstance(value, int):
+            value = 'desc' if value == _odm.I_DESC else 'asc'
+
         self._widget.default_sort_field = value
 
     @property
@@ -201,7 +204,8 @@ class Browser:
                                 format(entity.__class__.__name__, type(row)))
 
             # Action buttons
-            if self._model_class.odm_ui_entity_actions_enabled():
+            if self._model_class.odm_ui_entity_actions_enabled() and \
+                    (self._model_class.odm_ui_modification_allowed() or self._model_class.odm_ui_deletion_allowed()):
                 actions = self._get_entity_action_buttons(entity)
                 for btn_data in entity.odm_ui_browser_entity_actions():
                     color = 'btn btn-xs btn-' + btn_data.get('color', 'default')
