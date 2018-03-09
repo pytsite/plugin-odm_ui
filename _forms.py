@@ -71,8 +71,8 @@ class Modify(_form.Form):
             _metatag.t_set('title', self.title)
 
         # Default redirect
-        if not self._redirect:
-            self._redirect = 'ENTITY_VIEW'
+        if not self.redirect:
+            self.redirect = 'ENTITY_VIEW'
 
         # CSS
         self.css += ' odm-ui-form odm-ui-form-' + self._model

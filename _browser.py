@@ -92,22 +92,22 @@ class Browser:
         self._widget.data_fields = value
 
     @property
-    def default_sort_field(self) -> int:
-        return _odm.I_DESC if self._widget.default_sort_field == 'desc' else _odm.I_ASC
+    def default_sort_field(self) -> str:
+        return self._widget.default_sort_field
 
     @default_sort_field.setter
-    def default_sort_field(self, value: _Union[int, str]):
-        if isinstance(value, int):
-            value = 'desc' if value == _odm.I_DESC else 'asc'
-
+    def default_sort_field(self, value: str):
         self._widget.default_sort_field = value
 
     @property
     def default_sort_order(self) -> str:
-        return self._widget.default_sort_order
+        return _odm.I_DESC if self._widget.default_sort_order == 'desc' else _odm.I_ASC
 
     @default_sort_order.setter
-    def default_sort_order(self, value: str):
+    def default_sort_order(self, value: _Union[int, str]):
+        if isinstance(value, int):
+            value = 'desc' if value == _odm.I_DESC else 'asc'
+
         self._widget.default_sort_order = value
 
     def insert_data_field(self, name: str, title: str = None, sortable: bool = True, pos: int = None):

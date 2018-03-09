@@ -4,6 +4,12 @@
 ## Changelog
 
 
+### 1.8.9 (2018-03-09)
+
+- Improper code in `Browser.default_sort_field` property fixed.
+- Form's `redirect` property improper usage fixed.
+
+
 ### 1.8.8 (2018-03-07)
 
 "Actions' column visibility conditions fixed.
