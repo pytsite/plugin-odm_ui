@@ -11,34 +11,29 @@ from . import _model
 
 
 class Modify(_form.Form):
-    def __init__(self, **kwargs):
-        """Init.
-        """
-        self._model = kwargs.get('model')
-        if not self._model:
-            raise ValueError('Model is not specified')
-
-        self._eid = kwargs.get('eid')
-        self._update_meta_title = kwargs.get('update_meta_title', True)
-
-        super().__init__(**kwargs)
-
     @property
     def update_meta_title(self) -> bool:
-        return self._update_meta_title
+        return self.attr('update_meta_title')
 
     @update_meta_title.setter
     def update_meta_title(self, value: bool):
-        self._update_meta_title = value
+        self.attrs['update_meta_title'] = value
 
     def _on_setup_form(self, **kwargs):
         """Hook.
         :param **kwargs:
         """
-        from ._api import dispense_entity
+        model = self.attr('model')
+
+        if not model:
+            raise ValueError('Model is not specified')
+
+        self.attrs.setdefault('eid', 0)
+        self.attrs.setdefault('update_meta_title', True)
 
         try:
-            entity = dispense_entity(self._model, self._eid)
+            from ._api import dispense_entity
+            entity = dispense_entity(model, self.attr('eid'))
         except _odm.error.EntityNotFound:
             raise _http.error.NotFound()
 
@@ -59,15 +54,15 @@ class Modify(_form.Form):
 
         # Form title
         if entity.is_new:
-            self._title = entity.t('odm_ui_form_title_create_' + self._model)
+            self._title = entity.t('odm_ui_form_title_create_' + model)
         else:
-            self._title = entity.t('odm_ui_form_title_modify_' + self._model)
+            self._title = entity.t('odm_ui_form_title_modify_' + model)
 
         # Setting up the form through entity hook and global event
         entity.odm_ui_m_form_setup(self)
-        _events.fire('odm_ui@m_form_setup.{}'.format(self._model), frm=self, entity=entity)
+        _events.fire('odm_ui@m_form_setup.{}'.format(model), frm=self, entity=entity)
 
-        if self._update_meta_title:
+        if self.attr('update_meta_title'):
             _metatag.t_set('title', self.title)
 
         # Default redirect
@@ -75,28 +70,31 @@ class Modify(_form.Form):
             self.redirect = 'ENTITY_VIEW'
 
         # CSS
-        self.css += ' odm-ui-form odm-ui-form-' + self._model
+        self.css += ' odm-ui-form odm-ui-form-' + model
 
     def _on_setup_widgets(self):
         from ._api import dispense_entity
 
-        # Setting up form's widgets through entity hook and global event
-        entity = dispense_entity(self._model, self._eid)
-        entity.odm_ui_m_form_setup_widgets(self)
-        _events.fire('odm_ui@m_form_setup_widgets.{}'.format(self._model), frm=self, entity=entity)
+        model = self.attr('model')
+        eid = self.attr('eid')
 
-        if self.step == 1:
+        # Setting up form's widgets through entity hook and global event
+        entity = dispense_entity(model, eid)
+        entity.odm_ui_m_form_setup_widgets(self)
+        _events.fire('odm_ui@m_form_setup_widgets.{}'.format(model), frm=self, entity=entity)
+
+        if self.current_step == 1:
             # Entity model
             self.add_widget(_widget.input.Hidden(
                 uid='model',
-                value=self._model,
+                value=model,
                 form_area='hidden',
             ))
 
             # Entity ID
             self.add_widget(_widget.input.Hidden(
                 uid='eid',
-                value=self._eid,
+                value=eid,
                 form_area='hidden',
             ))
 
@@ -112,7 +110,7 @@ class Modify(_form.Form):
 
         self.add_widget(_widget.button.Link(
             weight=15,
-            uid='action-cancel-' + str(self.step),
+            uid='action-cancel-' + str(self.current_step),
             value=_lang.t('odm_ui@cancel'),
             icon='fa fa-fw fa-remove',
             href=cancel_href,
@@ -124,13 +122,13 @@ class Modify(_form.Form):
         # Ask entity to validate the form
         from ._api import dispense_entity
 
-        dispense_entity(self._model, self._eid).odm_ui_m_form_validate(self)
+        dispense_entity(self.attr('model'), self.attr('eid')).odm_ui_m_form_validate(self)
 
     def _on_submit(self):
         from ._api import dispense_entity
 
         # Dispense entity
-        entity = dispense_entity(self._model, self._eid)
+        entity = dispense_entity(self.attr('model'), self.attr('eid'))
 
         # Fill entity fields
         # Let entity know about form submission
@@ -162,25 +160,20 @@ class MassAction(_form.Form):
     """ODM UI Mass Action Form.
     """
 
-    def __init__(self, **kwargs):
-        """Init.
-        """
-        self._model = kwargs.get('model')
-        if not self._model:
-            raise ValueError('Model is not specified.')
-
-        self._eids = kwargs.get('eids')
-        if isinstance(self._eids, str):
-            self._eids = self._eids.split(',')
-
-        super().__init__(**kwargs)
-
     def _on_setup_form(self, **kwargs):
-        """Hook.
-        :param **kwargs:
+        """Hook
         """
+        super()._on_setup_form(**kwargs)
+
+        if not self.attr('model'):
+            raise ValueError('Model is not specified')
+
+        eids = self.attr('eids', [])
+        if isinstance(eids, str):
+            self.attrs['eids'] = eids.split(',')
+
         if not self._redirect:
-            self._redirect = _router.rule_url('odm_ui@browse', {'model': self._model})
+            self._redirect = _router.rule_url('odm_ui@browse', {'model': self.attr('model')})
 
     def _on_setup_widgets(self):
         """Hook.
@@ -189,8 +182,8 @@ class MassAction(_form.Form):
 
         # List of items to process
         ol = _html.Ol()
-        for eid in self._eids:
-            entity = dispense_entity(self._model, eid)
+        for eid in self.attr('eids'):
+            entity = dispense_entity(self.attr('model'), eid)
             self.add_widget(_widget.input.Hidden(uid='ids-' + eid, name='ids', value=eid))
             ol.append(_html.Li(entity.odm_ui_mass_action_entity_description()))
         self.add_widget(_widget.static.HTML(uid='ids-text', em=ol))
@@ -217,19 +210,20 @@ class Delete(MassAction):
 
     def _on_setup_form(self, **kwargs):
         """Hook.
-        :param **kwargs:
         """
         super()._on_setup_form()
 
+        model = self.attr('model')
+
         # Check permissions
-        for eid in self._eids:
-            if not (_odm_auth.check_permission('delete', self._model) or
-                    _odm_auth.check_permission('delete_own', self._model, eid)):
+        for eid in self.attr('eids', []):
+            if not (_odm_auth.check_permission('delete', model) or
+                    _odm_auth.check_permission('delete_own', model, eid)):
                 raise _http.error.Forbidden()
 
         # Page title
-        model_class = _odm.get_model_class(self._model)  # type: _model.UIEntity
-        _metatag.t_set('title', model_class.t('odm_ui_form_title_delete_' + self._model))
+        model_class = _odm.get_model_class(model)  # type: _model.UIEntity
+        _metatag.t_set('title', model_class.t('odm_ui_form_title_delete_' + model))
 
     def _on_setup_widgets(self):
         """Hook.
@@ -242,10 +236,12 @@ class Delete(MassAction):
     def _on_submit(self):
         from ._api import dispense_entity
 
+        model = self.attr('model')
+
         try:
             # Delete entities
-            for eid in self._eids:
-                dispense_entity(self._model, eid).odm_ui_d_form_submit()
+            for eid in self.attr('eids', []):
+                dispense_entity(model, eid).odm_ui_d_form_submit()
 
             _router.session().add_info_message(_lang.t('odm_ui@operation_successful'))
 
@@ -254,6 +250,6 @@ class Delete(MassAction):
             _logger.error(e)
             _router.session().add_error_message(_lang.t('odm_ui@entity_deletion_forbidden') + '. ' + str(e))
 
-        default_redirect = _router.rule_url('odm_ui@browse', {'model': self._model})
+        default_redirect = _router.rule_url('odm_ui@browse', {'model':model})
 
         return _http.response.Redirect(_router.request().inp.get('__redirect', default_redirect))

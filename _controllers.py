@@ -21,10 +21,9 @@ class ModifyForm(_routing.Controller):
     def exec(self) -> str:
         """Get entity create/modify form.
         """
-        model = self.arg('model')
-        eid = self.arg('eid')
         try:
-            form = _api.get_m_form(model, eid if eid != '0' else None, hide_title=True)
+            eid = self.arg('eid')
+            form = _api.get_m_form(self.arg('model'), eid if eid != '0' else None, hide_title=True)
             form = _tpl.render('odm_ui@form', {'form': form})
             return _admin.render(form)
         except _odm.error.EntityNotFound:

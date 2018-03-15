@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 1.9 (2018-03-15)
+
+Support for `form-2.0` and `widget-1.6`.
+
+
 ### 1.8.9 (2018-03-09)
 
 - Improper code in `Browser.default_sort_field` property fixed.

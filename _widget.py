@@ -63,7 +63,7 @@ class EntitySelect(_widget.select.Select):
     def sort_field(self, value: str):
         self._sort_field = value
 
-    def set_val(self, value, **kwargs):
+    def set_val(self, value):
         """Set value of the widget.
         """
         if value == '':
@@ -74,7 +74,7 @@ class EntitySelect(_widget.select.Select):
             value = _odm.get_by_ref(value)
             value = value.model + ':' + str(value.id)
 
-        return super().set_val(value, **kwargs)
+        return super().set_val(value)
 
     def _get_finder(self) -> _odm.Finder:
         finder = _odm.find(self._model).sort([(self._sort_field, self._sort_order)])
@@ -152,7 +152,7 @@ class EntityCheckboxes(_widget.select.Checkboxes):
         """
         self._sort_field = value
 
-    def set_val(self, value, **kwargs):
+    def set_val(self, value):
         """Set value of the widget.
 
         :param value: list[odm.models.ODMModel] | list[DBRef] | list[str]
@@ -177,7 +177,7 @@ class EntityCheckboxes(_widget.select.Checkboxes):
             if entity:
                 clean_val.append(str(entity))
 
-        return super().set_val(clean_val, **kwargs)
+        return super().set_val(clean_val)
 
     def _get_element(self, **kwargs):
         finder = _odm.find(self._model).sort([(self._sort_field, _odm.I_ASC)])
