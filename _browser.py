@@ -41,7 +41,7 @@ class Browser:
         )
 
         # Check permissions
-        if not self._mock.odm_auth_check_permission('view'):
+        if not self._mock.odm_auth_check_permission(self._mock.odm_auth_permissions()):
             raise _http.error.Forbidden()
 
         self._current_user = _auth.get_current_user()
@@ -58,7 +58,8 @@ class Browser:
             raise RuntimeError('No data fields was defined')
 
         # Actions column
-        if self._model_class.odm_ui_entity_actions_enabled():
+        if self._model_class.odm_ui_entity_actions_enabled() and \
+                (self._model_class.odm_ui_modification_allowed() or self._model_class.odm_ui_deletion_allowed()):
             self.insert_data_field('_actions', 'odm_ui@actions', False)
 
         _assetman.preload('odm_ui@css/odm-ui-browser.css')

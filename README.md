@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 1.9.1 (2018-03-18)
+
+Permissions checking fixed.
+
+
 ### 1.9 (2018-03-15)
 
 Support for `form-2.0` and `widget-1.6`.
