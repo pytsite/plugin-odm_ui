@@ -110,7 +110,7 @@ class Modify(_form.Form):
 
         self.add_widget(_widget.button.Link(
             weight=15,
-            uid='action-cancel-' + str(self.current_step),
+            uid='action_cancel_' + str(self.current_step),
             value=_lang.t('odm_ui@cancel'),
             icon='fa fa-fw fa-remove',
             href=cancel_href,
@@ -189,13 +189,13 @@ class MassAction(_form.Form):
         self.add_widget(_widget.static.HTML(uid='ids-text', em=ol))
 
         # Submit button
-        submit_button = self.get_widget('action-submit')  # type: _widget.button.Submit
+        submit_button = self.get_widget('action_submit')  # type: _widget.button.Submit
         submit_button.value = _lang.t('odm_ui@continue')
         submit_button.icon = 'angle-double-right'
 
         # Cancel button
         self.add_widget(_widget.button.Link(
-            uid='action-cancel',
+            uid='action_cancel',
             weight=10,
             value=_lang.t('odm_ui@cancel'),
             href=self.redirect,
@@ -231,7 +231,7 @@ class Delete(MassAction):
         super()._on_setup_widgets()
 
         # Change submit button color
-        self.get_widget('action-submit').color = 'danger'
+        self.get_widget('action_submit').color = 'danger'
 
     def _on_submit(self):
         from ._api import dispense_entity

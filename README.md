@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 1.10 (2018-04-04)
+
+Support for `form-2.3`.
+
+
 ### 1.9.1 (2018-03-18)
 
 Permissions checking fixed.
