@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 2.0 (2018-04-06)
+
+Support for `odm-2.0`.
+
+
 ### 1.10 (2018-04-04)
 
 Support for `form-2.3`.

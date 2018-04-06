@@ -33,7 +33,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
         else:
             for name, field in finder.mock.fields.items():
                 if isinstance(field, _odm.field.String):
-                    finder.or_where(name, 'regex_i', query)
+                    finder.or_regex(name, query, True)
 
     @classmethod
     def odm_ui_browser_mass_action_buttons(cls) -> _Tuple[_Dict, ...]:
