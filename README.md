@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 2.1 (2018-04-09)
+
+New constructor's argument in `widget.EntitySelect`: `advanced_sort`.
+
+
 ### 2.0 (2018-04-06)
 
 Support for `odm-2.0`.

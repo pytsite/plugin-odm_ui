@@ -15,7 +15,7 @@ class EntitySelect(_widget.select.Select):
     """
 
     def __init__(self, uid: str, **kwargs):
-        """Init.
+        """Init
         """
         if 'exclude' in kwargs and kwargs['exclude']:
             if isinstance(kwargs['exclude'], _odm.Entity):
@@ -46,14 +46,17 @@ class EntitySelect(_widget.select.Select):
         if not self._model:
             raise ValueError('Model is not specified')
 
+        self._mock = _odm.dispense(self._model)
+
         self._caption_field = kwargs.get('caption_field')
         if not self._caption_field:
             raise ValueError('Caption field is not specified')
 
-        self._sort_field = kwargs.get('sort_field', self._caption_field)
-        self._sort_order = kwargs.get('sort_order', _odm.I_ASC)
+        self._sort_field = kwargs.get('sort_field', self._caption_field)  # type: str
+        self._sort_order = kwargs.get('sort_order', _odm.I_ASC)  # type: int
         self._finder_adjust = kwargs.get('finder_adjust')  # type: _Callable[[_odm.Finder], None]
         self._caption_adjust = kwargs.get('caption_adjust')  # type: _Callable[[_odm.Finder], None]
+        self._advanced_sort = kwargs.get('advanced_sort', True)  # type: bool
 
     @property
     def sort_field(self) -> str:
@@ -94,11 +97,11 @@ class EntitySelect(_widget.select.Select):
 
         return caption
 
-    def _build_items_tree(self, entities: _Iterable[_odm.Entity], _result: list = None) -> _List[_Tuple[str, str]]:
+    def _build_items_tree(self, root_entities: _Iterable[_odm.Entity], _result: list = None) -> _List[_Tuple[str, str]]:
         if _result is None:
             _result = []
 
-        for entity in entities:
+        for entity in root_entities:
             _result.append((entity.manual_ref, self._get_caption(entity)))
             self._build_items_tree(entity.children, _result)
 
@@ -107,7 +110,14 @@ class EntitySelect(_widget.select.Select):
     def _get_element(self, **kwargs):
         """Render the widget
         """
-        for item in self._build_items_tree([entity for entity in self._get_finder().eq('_parent', None)]):
+        root_items = [entity for entity in self._get_finder().eq('_parent', None)]
+
+        if self._advanced_sort and isinstance(self._mock.get_field(self._sort_field), _odm.field.String):
+            from pyuca import Collator
+            rev = True if self._sort_order == _odm.I_DESC else False
+            root_items = sorted(root_items, key=lambda e: Collator().sort_key(e.f_get(self._sort_field)), reverse=rev)
+
+        for item in self._build_items_tree(root_items):
             self._items.append((item[0], item[1]))
 
         return super()._get_element()
