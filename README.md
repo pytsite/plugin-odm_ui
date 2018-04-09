@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 2.1.1 (2018-04-09)
+
+Performance issue fixed.
+
+
 ### 2.1 (2018-04-09)
 
 New constructor's argument in `widget.EntitySelect`: `advanced_sort`.

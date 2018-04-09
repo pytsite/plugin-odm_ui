@@ -6,8 +6,11 @@ __license__ = 'MIT'
 
 from typing import List as _List, Tuple as _Tuple, Callable as _Callable, Iterable as _Iterable
 from bson.dbref import DBRef as _DBRef
+from pyuca import Collator as _Collator
 from pytsite import lang as _lang
 from plugins import widget as _widget, odm as _odm
+
+_pyuca_col = _Collator()
 
 
 class EntitySelect(_widget.select.Select):
@@ -113,9 +116,8 @@ class EntitySelect(_widget.select.Select):
         root_items = [entity for entity in self._get_finder().eq('_parent', None)]
 
         if self._advanced_sort and isinstance(self._mock.get_field(self._sort_field), _odm.field.String):
-            from pyuca import Collator
             rev = True if self._sort_order == _odm.I_DESC else False
-            root_items = sorted(root_items, key=lambda e: Collator().sort_key(e.f_get(self._sort_field)), reverse=rev)
+            root_items = sorted(root_items, key=lambda e: _pyuca_col.sort_key(e.f_get(self._sort_field)), reverse=rev)
 
         for item in self._build_items_tree(root_items):
             self._items.append((item[0], item[1]))
