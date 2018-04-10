@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 2.2.1 (2018-04-10)
+
+Forms processing issues fixed.
+
+
 ### 2.2 (2018-04-10)
 
 Way of processing modify forms changed.

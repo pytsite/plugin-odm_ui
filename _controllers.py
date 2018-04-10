@@ -23,9 +23,10 @@ class ModifyForm(_routing.Controller):
         """
         try:
             eid = self.arg('eid')
-            form = _api.get_m_form(self.arg('model'), eid if eid != '0' else None, hide_title=True)
-            form = _tpl.render('odm_ui@form', {'form': form})
-            return _admin.render(form)
+            redirect = _router.rule_url('odm_ui@browse', {'model': self.arg('model')})
+            form = _api.get_m_form(self.arg('model'), eid if eid != '0' else None, hide_title=True, redirect=redirect)
+            return _admin.render(_tpl.render('odm_ui@form', {'form': form}))
+
         except _odm.error.EntityNotFound:
             raise self.not_found()
 
@@ -43,4 +44,6 @@ class DeleteForm(_routing.Controller):
         if not model or not ids:
             raise self.not_found()
 
-        return _admin.render(_tpl.render('odm_ui@form', {'form': _api.get_d_form(model, ids)}))
+        form = _api.get_d_form(model, ids, redirect=_router.rule_url('odm_ui@browse', {'model': self.arg('model')}))
+
+        return _admin.render(_tpl.render('odm_ui@form', {'form': form}))

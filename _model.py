@@ -162,7 +162,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
         """Hook
         """
         # Populate form values to entity fields
-        for f_name, f_value in self.values.items():
+        for f_name, f_value in frm.values.items():
             if self.has_field(f_name):
                 self.f_set(f_name, f_value)
 

@@ -64,7 +64,7 @@ class Modify(_form.Form):
         if self.attr('update_meta_title'):
             _metatag.t_set('title', self.title)
 
-        # Default redirect
+        # Redirect
         if not self.redirect:
             self.redirect = 'ENTITY_VIEW'
 
@@ -100,7 +100,7 @@ class Modify(_form.Form):
         # Cancel button
         cancel_href = '#'
         if not self.modal:
-            cancel_href = _router.request().inp.get('__redirect')
+            cancel_href = self.redirect
             if not cancel_href or cancel_href == 'ENTITY_VIEW':
                 if not entity.is_new and entity.odm_ui_view_url():
                     cancel_href = entity.odm_ui_view_url()
@@ -159,8 +159,8 @@ class MassAction(_form.Form):
         if isinstance(eids, str):
             self.attrs['eids'] = eids.split(',')
 
-        if not self._redirect:
-            self._redirect = _router.rule_url('odm_ui@browse', {'model': self.attr('model')})
+        if not self.redirect:
+            self.redirect = _router.rule_url('odm_ui@browse', {'model': self.attr('model')})
 
     def _on_setup_widgets(self):
         """Hook.
@@ -237,6 +237,4 @@ class Delete(MassAction):
             _logger.error(e)
             _router.session().add_error_message(_lang.t('odm_ui@entity_deletion_forbidden') + '. ' + str(e))
 
-        default_redirect = _router.rule_url('odm_ui@browse', {'model':model})
-
-        return _http.response.Redirect(_router.request().inp.get('__redirect', default_redirect))
+        return _http.response.Redirect(self.redirect)
