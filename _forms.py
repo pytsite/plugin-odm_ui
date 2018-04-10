@@ -4,8 +4,8 @@ __author__ = 'Alexander Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
-from pytsite import lang as _lang, http as _http, events as _events, metatag as _metatag, \
-    router as _router, html as _html, logger as _logger, errors as _errors
+from pytsite import lang as _lang, http as _http, events as _events, metatag as _metatag, router as _router, \
+    html as _html, logger as _logger, errors as _errors
 from plugins import widget as _widget, form as _form, odm as _odm, odm_auth as _odm_auth
 from . import _model
 
@@ -38,7 +38,6 @@ class Modify(_form.Form):
             raise _http.error.NotFound()
 
         # Check if entities of this model can be created
-
         if entity.is_new:
             perms_allow = entity.odm_auth_check_permission('create')
             odm_ui_allows = entity.odm_ui_creation_allowed()
@@ -131,23 +130,11 @@ class Modify(_form.Form):
         entity = dispense_entity(self.attr('model'), self.attr('eid'))
 
         # Fill entity fields
-        # Let entity know about form submission
-        entity.odm_ui_m_form_submit(self)
-
-        # Populate form values to entity
-        for f_name, f_value in self.values.items():
-            if entity.has_field(f_name):
-                entity.f_set(f_name, f_value)
-
         try:
-            # Save entity
-            entity.save()
-            _router.session().add_info_message(_lang.t('odm_ui@operation_successful'))
-
-        except Exception as exc:
-            _router.session().add_error_message(str(exc))
-            _logger.error(exc)
-            raise exc
+            entity.odm_ui_m_form_submit(self)
+        except Exception as e:
+            _router.session().add_error_message(str(e))
+            raise e
 
         # Process 'special' redirect endpoint
         if self.redirect == 'ENTITY_VIEW':

@@ -5,13 +5,14 @@ __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
 from typing import Tuple as _Tuple, Dict as _Dict, Type as _Type
-from pytsite import router as _router
+from pytsite import router as _router, lang as _lang
 from plugins import widget as _widget, odm as _odm, odm_auth as _odm_auth, form as _form
 
 
 class UIEntity(_odm_auth.model.OwnedEntity):
     """ODM entity with UI related methods.
     """
+
     @classmethod
     def odm_ui_browser_widget_class(cls) -> _Type[_widget.misc.DataTable]:
         return _widget.misc.BootstrapTable
@@ -153,23 +154,26 @@ class UIEntity(_odm_auth.model.OwnedEntity):
                 ))
 
     def odm_ui_m_form_validate(self, frm: _form.Form):
-        """Hook.
+        """Hook
         """
         pass
 
     def odm_ui_m_form_submit(self, frm: _form.Form):
-        """Hook.
+        """Hook
         """
-        pass
+        # Populate form values to entity fields
+        for f_name, f_value in self.values.items():
+            if self.has_field(f_name):
+                self.f_set(f_name, f_value)
+
+        # Save entity
+        self.save()
+        _router.session().add_info_message(_lang.t('odm_ui@operation_successful'))
 
     def odm_ui_d_form_submit(self):
-        """Hook.
+        """Hook
         """
-        try:
-            self.delete()
-        except _odm.error.EntityDeleted:
-            # Entity was deleted by another instance
-            pass
+        self.delete()
 
     def odm_ui_d_form_url(self, ajax: bool = False) -> str:
         if hasattr(self, 'model') and hasattr(self, 'id'):
