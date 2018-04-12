@@ -205,7 +205,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
             return _router.rule_url('odm_ui@m_form', args)
 
         else:
-            raise NotImplementedError('Not implemented yet.')
+            raise NotImplementedError('Not implemented')
 
     def odm_ui_view_url(self) -> str:
         return ''

@@ -20,8 +20,7 @@ class Modify(_form.Form):
         self.attrs['update_meta_title'] = value
 
     def _on_setup_form(self, **kwargs):
-        """Hook.
-        :param **kwargs:
+        """Hook
         """
         model = self.attr('model')
 

@@ -4,6 +4,12 @@
 ## Changelog
 
 
+### 2.3 (2018-04-12)
+
+- New API functions: `dispense_entity()`, `get_browser()`.
+- Entities browser rendering fixed.
+
+
 ### 2.2.1 (2018-04-10)
 
 Forms processing issues fixed.

@@ -11,9 +11,11 @@ from . import _api, _browser
 
 
 class Browse(_routing.Controller):
+    """Entities browser
+    """
     def exec(self) -> str:
-        return _admin.render(_tpl.render('odm_ui@browser', {
-            'table': _browser.Browser(self.arg('model')).render()
+        return _admin.render(_tpl.render('odm_ui@browse', {
+            'browser': _api.get_browser(self.arg('model'))
         }))
 
 

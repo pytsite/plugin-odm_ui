@@ -263,7 +263,6 @@ class Browser:
         return group
 
     def render(self) -> str:
-
         # Browser title
         _metatag.t_set('title', self._model_class.t('odm_ui_browser_title_' + self._model))
         _metatag.t_set('description', '')
@@ -302,4 +301,9 @@ class Browser:
             self._widget.toolbar.append(button)
             self._widget.toolbar.append(_html.Span('&nbsp;'))
 
-        return self._widget.render()
+        frm = _html.Form(self._widget.get_element(), action='#', method='post', css='table-responsive odm-ui-browser')
+
+        return frm.render()
+
+    def __str__(self) -> str:
+        return self.render()
