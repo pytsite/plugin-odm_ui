@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 3.1 (2018-04-14)
+
+Three properties added to `Browser`.
+
+
 ### 3.0.2 (2018-04-14)
 
 Exception detals fixed.

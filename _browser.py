@@ -114,6 +114,30 @@ class Browser:
 
         self._widget.default_sort_order = value
 
+    @property
+    def browse_rule(self) -> str:
+        return self._browse_rule
+
+    @browse_rule.setter
+    def browse_rule(self, value: str):
+        self._browse_rule = value
+
+    @property
+    def m_form_rule(self) -> str:
+        return self._m_form_rule
+
+    @m_form_rule.setter
+    def m_form_rule(self, value: str):
+        self._m_form_rule = value
+
+    @property
+    def d_form_rule(self) -> str:
+        return self._d_form_rule
+
+    @d_form_rule.setter
+    def d_form_rule(self, value: str):
+        self._d_form_rule = value
+
     def insert_data_field(self, name: str, title: str = None, sortable: bool = True, pos: int = None):
         self._widget.insert_data_field(name, title, sortable, pos)
 
