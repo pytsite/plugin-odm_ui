@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 3.0.2 (2018-04-14)
+
+Exception detals fixed.
+
+
 ### 3.0.1 (2018-04-14)
 
 `plugin.json` fixed.

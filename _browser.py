@@ -194,10 +194,10 @@ class Browser:
                 expected_row_length = len(self.data_fields)
                 if self._model_class.odm_ui_entity_actions_enabled():
                     expected_row_length -= 1
-                if len(row) != expected_row_length:
-                    raise ValueError(
-                        '{}.odm_ui_browser_row() returns invalid number of cells'.format(entity.__class__.__name__)
-                    )
+                row_length = len(row)
+                if row_length != expected_row_length:
+                    raise ValueError('{}.odm_ui_browser_row() returns invalid number of cells: expected {}, got {}'.
+                                     format(entity.__class__.__name__, expected_row_length, row_length))
                 for f_name, cell_content in zip([df[0] for df in self.data_fields], row):
                     fields_data[f_name] = cell_content
             elif isinstance(row, dict):
