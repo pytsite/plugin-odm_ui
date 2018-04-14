@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 3.0.1 (2018-04-14)
+
+`plugin.json` fixed.
+
+
 ### 3.0 (2018-04-14)
 
 - Admin router's rules renamed.
