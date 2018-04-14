@@ -4,6 +4,13 @@
 ## Changelog
 
 
+### 3.0 (2018-04-14)
+
+- Admin router's rules renamed.
+- Entities forms and browser refactored.
+- `UIEntity`'s methods mess eliminated.
+
+
 ### 2.3 (2018-04-12)
 
 - New API functions: `dispense_entity()`, `get_browser()`.

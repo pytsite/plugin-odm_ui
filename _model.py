@@ -82,13 +82,54 @@ class UIEntity(_odm_auth.model.OwnedEntity):
         if hasattr(self, 'id'):
             return str(self.id)
 
+    @classmethod
+    def odm_ui_browse_rule(cls) -> str:
+        """Get browse router's rule name
+        """
+        return 'odm_ui@admin_browse'
+
+    def odm_ui_browse_url(self, args: dict = None):
+        """Get browse URL
+        """
+        args.update({
+            'model': self.model
+        })
+
+        return _router.rule_url(self.odm_ui_browse_rule(), args)
+
+    @classmethod
+    def odm_ui_m_form_rule(cls) -> str:
+        """Get modify form router's rule name
+        """
+        return 'odm_ui@admin_m_form'
+
+    def odm_ui_m_form_url(self, args: dict = None):
+        """Get modify form URL
+        """
+        if args is None:
+            args = {}
+
+        args.update({
+            'model': self.model,
+            'eid': str(self.id),
+            '__redirect': 'ENTITY_VIEW',
+        })
+
+        return _router.rule_url(self.odm_ui_m_form_rule(), args)
+
+    @property
+    def modify_url(self) -> str:
+        """Shortcut
+        """
+        return self.odm_ui_m_form_url()
+
     def odm_ui_m_form_setup(self, frm: _form.Form):
-        """Hook.
+        """Hook
         """
         pass
 
     def odm_ui_m_form_setup_widgets(self, frm: _form.Form):
-        """Hook.
+        """Hook
         """
         weight = 0
         for uid, field in self.fields.items():
@@ -170,57 +211,66 @@ class UIEntity(_odm_auth.model.OwnedEntity):
         self.save()
         _router.session().add_info_message(_lang.t('odm_ui@operation_successful'))
 
+    @classmethod
+    def odm_ui_d_form_rule(cls) -> str:
+        return 'odm_ui@admin_d_form'
+
+    def odm_ui_d_form_url(self, ajax: bool = False) -> str:
+        args = {
+            'model': self.model,
+            'ids': str(self.id)
+        }
+
+        if ajax:
+            args['ajax'] = 'true'
+
+        return _router.rule_url(self.odm_ui_d_form_rule(), args)
+
+    def odm_ui_d_form_setup(self, frm: _form.Form):
+        """Hook
+        """
+        raise NotImplementedError('Not implemented yet')
+
+    def odm_ui_d_form_setup_widgets(self, frm: _form.Form):
+        """Hook
+        """
+        raise NotImplementedError('Not implemented yet')
+
+    def odm_ui_d_form_validate(self, frm: _form.Form):
+        """Hook
+        """
+        raise NotImplementedError('Not implemented yet')
+
     def odm_ui_d_form_submit(self):
         """Hook
         """
         self.delete()
 
-    def odm_ui_d_form_url(self, ajax: bool = False) -> str:
-        if hasattr(self, 'model') and hasattr(self, 'id'):
-            if ajax:
-                return _router.rule_url('odm_ui@d_form_submit', {
-                    'model': self.model,
-                    'ids': str(self.id),
-                    'ajax': 'true'
-                })
-            else:
-                return _router.rule_url('odm_ui@d_form', {
-                    'model': self.model,
-                    'ids': str(self.id)
-                })
-        else:
-            raise NotImplementedError('Not implemented yet.')
+    @classmethod
+    def odm_ui_view_rule(cls) -> str:
+        """Get view router rule name
+        """
+        raise NotImplementedError('Not implemented yet')
 
-    def odm_ui_m_form_url(self, args: dict = None):
-        if hasattr(self, 'model') and hasattr(self, 'id'):
-            if not args:
-                args = {}
+    def odm_ui_view_url(self, args: dict = None) -> str:
+        if self.is_new:
+            raise RuntimeError("Cannot generate view URL for non-saved entity of model '{}'".format(self.model))
 
-            args.update({
-                'model': self.model,
-                'eid': str(self.id),
-                '__redirect': 'ENTITY_VIEW',
-            })
+        if args is None:
+            args = {}
 
-            return _router.rule_url('odm_ui@m_form', args)
+        args.update({
+            'model': self.model,
+            'id': str(self.id),
+        })
 
-        else:
-            raise NotImplementedError('Not implemented')
-
-    def odm_ui_view_url(self) -> str:
-        return ''
+        return _router.rule_url(self.odm_ui_view_rule(), args)
 
     @property
     def url(self) -> str:
-        """Shortcut.
+        """Shortcut
         """
         return self.odm_ui_view_url()
-
-    @property
-    def modify_url(self) -> str:
-        """Shortcut.
-        """
-        return self.odm_ui_m_form_url()
 
     def as_jsonable(self, **kwargs) -> dict:
         r = super().as_jsonable(**kwargs)

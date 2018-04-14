@@ -159,7 +159,7 @@ class MassAction(_form.Form):
             self.attrs['eids'] = eids.split(',')
 
         if not self.redirect:
-            self.redirect = _router.rule_url('odm_ui@browse', {'model': self.attr('model')})
+            self.redirect = _router.rule_url('odm_ui@admin_browse', {'model': self.attr('model')})
 
     def _on_setup_widgets(self):
         """Hook.

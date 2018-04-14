@@ -36,16 +36,16 @@ def plugin_load_wsgi():
     abp = admin.base_path()
 
     # Route: ODM browser page
-    router.handle(_controllers.Browse, abp + '/odm_ui/<model>', 'odm_ui@browse',
+    router.handle(_controllers.Browse, abp + '/odm_ui/<model>', 'odm_ui@admin_browse',
                   filters=auth_ui.AuthFilterController)
 
     # Route: 'create/modify' ODM entity form display
-    router.handle(_controllers.ModifyForm, abp + '/odm_ui/<model>/modify/<eid>', 'odm_ui@m_form',
+    router.handle(_controllers.ModifyForm, abp + '/odm_ui/<model>/modify/<eid>', 'odm_ui@admin_m_form',
                   filters=auth_ui.AuthFilterController)
 
     # Route: 'delete' form display
-    router.handle(_controllers.DeleteForm, abp + '/odm_ui/<model>/delete', 'odm_ui@d_form', methods=('GET', 'POST'),
-                  filters=auth_ui.AuthFilterController)
+    router.handle(_controllers.DeleteForm, abp + '/odm_ui/<model>/delete', 'odm_ui@admin_d_form',
+                  methods=('GET', 'POST'), filters=auth_ui.AuthFilterController)
 
     # HTTP API handlers
     http_api.handle('GET', 'odm_ui/rows/<model>', _http_api_controllers.GetRows, 'odm_ui@get_rows')

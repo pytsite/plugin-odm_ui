@@ -16,7 +16,7 @@ class Browser:
     """ODM Entities Browser
     """
 
-    def __init__(self, model: str):
+    def __init__(self, model: str, **kwargs):
         """Init
         """
         if not model:
@@ -37,7 +37,7 @@ class Browser:
             raise TypeError('Subclass of {} expected, got'.format(_widget.misc.DataTable, widget_class))
         self._widget = widget_class(
             uid='odm-ui-browser-' + model,
-            data_url=_http_api.url('odm_ui@get_rows', {'model': self._model}),
+            rows_url=_http_api.url('odm_ui@get_rows', {'model': self._model}),
         )
 
         # Check permissions
@@ -46,6 +46,9 @@ class Browser:
 
         self._current_user = _auth.get_current_user()
         self._finder_adjust = self._default_finder_adjust
+        self._browse_rule = kwargs.get('browse_rule', self._model_class.odm_ui_browse_rule())
+        self._m_form_rule = kwargs.get('m_form_rule', self._model_class.odm_ui_m_form_rule())
+        self._d_form_rule = kwargs.get('d_form_rule', self._model_class.odm_ui_d_form_rule())
 
         # Call model's class to perform setup tasks
         self._model_class.odm_ui_browser_setup(self)
@@ -228,18 +231,17 @@ class Browser:
 
         return r
 
-    @staticmethod
-    def _get_entity_action_buttons(entity: _model.UIEntity) -> _html.Div:
+    def _get_entity_action_buttons(self, entity: _model.UIEntity) -> _html.Div:
         """Get action buttons for entity.
         """
         group = _html.Div(css='entity-actions', data_entity_id=str(entity.id))
 
         if entity.odm_ui_modification_allowed() and \
                 (entity.odm_auth_check_permission('modify') or entity.odm_auth_check_permission('modify_own')):
-            m_form_url = _router.rule_url('odm_ui@m_form', {
+            m_form_url = _router.rule_url(self._m_form_rule, {
                 'model': entity.model,
                 'eid': str(entity.id),
-                '__redirect': _router.rule_url('odm_ui@browse', {'model': entity.model}),
+                '__redirect': _router.rule_url(self._browse_rule, {'model': entity.model}),
             })
             title = _lang.t('odm_ui@modify')
             a = _html.A(css='btn btn-xs btn-default', href=m_form_url, title=title)
@@ -249,10 +251,10 @@ class Browser:
 
         if entity.odm_ui_deletion_allowed() and \
                 (entity.odm_auth_check_permission('delete') or entity.odm_auth_check_permission('delete_own')):
-            d_form_url = _router.rule_url('odm_ui@d_form', {
+            d_form_url = _router.rule_url(self._d_form_rule, {
                 'model': entity.model,
                 'ids': str(entity.id),
-                '__redirect': _router.rule_url('odm_ui@browse', {'model': entity.model}),
+                '__redirect': _router.rule_url(self._browse_rule, {'model': entity.model}),
             })
             title = _lang.t('odm_ui@delete')
             a = _html.A(css='btn btn-xs btn-danger', href=d_form_url, title=title)
@@ -269,7 +271,7 @@ class Browser:
 
         # 'Create' toolbar button
         if self._mock.odm_auth_check_permission('create') and self._mock.odm_ui_creation_allowed():
-            create_form_url = _router.rule_url('odm_ui@m_form', {
+            create_form_url = _router.rule_url(self._m_form_rule, {
                 'model': self._model,
                 'eid': '0',
                 '__redirect': _router.current_url(),
@@ -282,7 +284,7 @@ class Browser:
 
         # 'Delete' toolbar button
         if self._mock.odm_auth_check_permission('delete') and self._mock.odm_ui_deletion_allowed():
-            delete_form_url = _router.rule_url('odm_ui@d_form', {'model': self._model})
+            delete_form_url = _router.rule_url(self._d_form_rule, {'model': self._model})
             title = _lang.t('odm_ui@delete_selected')
             btn = _html.A(href=delete_form_url, css='hidden btn btn-danger mass-action-button', title=title)
             btn.append(_html.I(css='fa fa-fw fa-remove'))
@@ -301,7 +303,7 @@ class Browser:
             self._widget.toolbar.append(button)
             self._widget.toolbar.append(_html.Span('&nbsp;'))
 
-        frm = _html.Form(self._widget.get_element(), action='#', method='post', css='table-responsive odm-ui-browser')
+        frm = _html.Form(self._widget.render(), action='#', method='post', css='table-responsive odm-ui-browser')
 
         return frm.render()
 
