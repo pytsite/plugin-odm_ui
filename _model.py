@@ -218,7 +218,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
     def odm_ui_d_form_url(self, ajax: bool = False) -> str:
         args = {
             'model': self.model,
-            'ids': str(self.id)
+            'eids': str(self.id)
         }
 
         if ajax:

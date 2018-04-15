@@ -172,9 +172,9 @@ class MassAction(_form.Form):
         ol = _html.Ol()
         for eid in self.attr('eids'):
             entity = dispense_entity(self.attr('model'), eid)
-            self.add_widget(_widget.input.Hidden(uid='ids-' + eid, name='ids', value=eid))
+            self.add_widget(_widget.input.Hidden(uid='eids-' + eid, name='eids', value=eid))
             ol.append(_html.Li(entity.odm_ui_mass_action_entity_description()))
-        self.add_widget(_widget.static.HTML(uid='ids-text', em=ol))
+        self.add_widget(_widget.static.HTML(uid='eids-text', em=ol))
 
         # Submit button
         submit_button = self.get_widget('action_submit')  # type: _widget.button.Submit

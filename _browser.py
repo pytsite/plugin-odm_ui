@@ -218,7 +218,7 @@ class Browser:
                     color = 'btn btn-xs btn-' + btn_data.get('color', 'default')
                     title = btn_data.get('title', '')
                     ep = btn_data.get('ep')
-                    url = _router.rule_url(ep, {'ids': str(entity.id)}) if ep else '#'
+                    url = _router.rule_url(ep, {'eids': str(entity.id)}) if ep else '#'
                     css = btn_data.get('css', '')
                     btn = _html.A(href=url, css=color + css, title=title)
                     btn.append(_html.I(css='fa fa-fw fa-' + btn_data.get('icon', 'question')))
@@ -256,7 +256,7 @@ class Browser:
                 (entity.odm_auth_check_permission('delete') or entity.odm_auth_check_permission('delete_own')):
             d_form_url = _router.rule_url(self._d_form_rule, {
                 'model': entity.model,
-                'ids': str(entity.id),
+                'eids': str(entity.id),
                 '__redirect': _router.rule_url(self._browse_rule, {'model': entity.model}),
             })
             title = _lang.t('odm_ui@delete')
