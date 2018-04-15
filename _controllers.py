@@ -25,8 +25,7 @@ class ModifyForm(_routing.Controller):
         """
         try:
             eid = self.arg('eid')
-            redirect = _router.rule_url('odm_ui@admin_browse', {'model': self.arg('model')})
-            form = _api.get_m_form(self.arg('model'), eid if eid != '0' else None, hide_title=True, redirect=redirect)
+            form = _api.get_m_form(self.arg('model'), eid if eid != '0' else None, hide_title=True)
             return _admin.render(_tpl.render('odm_ui@form', {'form': form}))
 
         except _odm.error.EntityNotFound:

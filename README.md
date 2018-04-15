@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 3.2.5 (2018-04-15)
+
+Removed unecessary redirect in modify form initialization.
+
+
 ### 3.2.4 (2018-04-15)
 
 Processing of request args by mass action forms fixed.
