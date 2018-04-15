@@ -67,6 +67,9 @@ class Browser:
 
         _assetman.preload('odm_ui@css/odm-ui-browser.css')
 
+        # Metatags
+        _metatag.t_set('title', self._model_class.t('odm_ui_browser_title_' + self._model))
+
     @property
     def model(self) -> str:
         """Get browser entities model
@@ -265,10 +268,6 @@ class Browser:
         return group
 
     def render(self) -> str:
-        # Browser title
-        _metatag.t_set('title', self._model_class.t('odm_ui_browser_title_' + self._model))
-        _metatag.t_set('description', '')
-
         # 'Create' toolbar button
         if self._mock.odm_auth_check_permission('create') and self._mock.odm_ui_creation_allowed():
             create_form_url = _router.rule_url(self._m_form_rule, {

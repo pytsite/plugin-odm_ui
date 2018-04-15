@@ -7,7 +7,7 @@ __license__ = 'MIT'
 
 from pytsite import tpl as _tpl, router as _router, routing as _routing
 from plugins import odm as _odm, admin as _admin
-from . import _api, _browser
+from . import _api
 
 
 class Browse(_routing.Controller):

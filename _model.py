@@ -261,7 +261,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
 
         args.update({
             'model': self.model,
-            'id': str(self.id),
+            'eid': str(self.id),
         })
 
         return _router.rule_url(self.odm_ui_view_rule(), args)

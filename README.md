@@ -4,7 +4,13 @@
 ## Changelog
 
 
-### 3.2 (2018-04-14)
+### 3.2.1 (2018-04-15)
+
+- Router rules argument names fixed.
+- Metatags set fixed.
+
+
+### 3.2 (2018-04-15)
 
 - Previously added properties removed.
 - Minor issues fixed.
