@@ -36,16 +36,13 @@ class ModifyForm(_routing.Controller):
 class DeleteForm(_routing.Controller):
     def exec(self) -> str:
         model = self.arg('model')
-
-        # Entities IDs to delete
-        ids = _router.request().inp.get('ids', [])
-        if isinstance(ids, str):
-            ids = [ids]
+        ids = self.arg('ids', [])
 
         # No required arguments has been received
         if not model or not ids:
             raise self.not_found()
 
-        form = _api.get_d_form(model, ids, redirect=_router.rule_url('odm_ui@admin_browse', {'model': self.arg('model')}))
+        redirect = _router.rule_url('odm_ui@admin_browse', {'model': self.arg('model')})
+        form = _api.get_d_form(model, ids, redirect=redirect)
 
         return _admin.render(_tpl.render('odm_ui@form', {'form': form}))

@@ -159,7 +159,9 @@ class MassAction(_form.Form):
             self.attrs['eids'] = eids.split(',')
 
         if not self.redirect:
-            self.redirect = _router.rule_url('odm_ui@admin_browse', {'model': self.attr('model')})
+            from ._api import get_model_class
+            model = self.attr('model')
+            self.redirect = _router.rule_url(get_model_class(model).odm_ui_browse_rule(), {'model': model})
 
     def _on_setup_widgets(self):
         """Hook.
@@ -225,7 +227,7 @@ class Delete(MassAction):
         model = self.attr('model')
 
         try:
-            # Delete entities
+            # Ask entities to process deletion
             for eid in self.attr('eids', []):
                 dispense_entity(model, eid).odm_ui_d_form_submit()
 

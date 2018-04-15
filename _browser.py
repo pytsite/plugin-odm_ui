@@ -16,7 +16,7 @@ class Browser:
     """ODM Entities Browser
     """
 
-    def __init__(self, model: str, **kwargs):
+    def __init__(self, model: str):
         """Init
         """
         if not model:
@@ -46,9 +46,9 @@ class Browser:
 
         self._current_user = _auth.get_current_user()
         self._finder_adjust = self._default_finder_adjust
-        self._browse_rule = kwargs.get('browse_rule', self._model_class.odm_ui_browse_rule())
-        self._m_form_rule = kwargs.get('m_form_rule', self._model_class.odm_ui_m_form_rule())
-        self._d_form_rule = kwargs.get('d_form_rule', self._model_class.odm_ui_d_form_rule())
+        self._browse_rule = self._model_class.odm_ui_browse_rule()
+        self._m_form_rule = self._model_class.odm_ui_m_form_rule()
+        self._d_form_rule = self._model_class.odm_ui_d_form_rule()
 
         # Call model's class to perform setup tasks
         self._model_class.odm_ui_browser_setup(self)
@@ -113,30 +113,6 @@ class Browser:
             value = 'desc' if value == _odm.I_DESC else 'asc'
 
         self._widget.default_sort_order = value
-
-    @property
-    def browse_rule(self) -> str:
-        return self._browse_rule
-
-    @browse_rule.setter
-    def browse_rule(self, value: str):
-        self._browse_rule = value
-
-    @property
-    def m_form_rule(self) -> str:
-        return self._m_form_rule
-
-    @m_form_rule.setter
-    def m_form_rule(self, value: str):
-        self._m_form_rule = value
-
-    @property
-    def d_form_rule(self) -> str:
-        return self._d_form_rule
-
-    @d_form_rule.setter
-    def d_form_rule(self, value: str):
-        self._d_form_rule = value
 
     def insert_data_field(self, name: str, title: str = None, sortable: bool = True, pos: int = None):
         self._widget.insert_data_field(name, title, sortable, pos)
