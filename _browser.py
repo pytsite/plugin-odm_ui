@@ -272,7 +272,7 @@ class Browser:
         if self._mock.odm_ui_creation_allowed() and self._mock.odm_auth_check_permission('create'):
             create_form_url = _router.rule_url(self._m_form_rule, {
                 'model': self._model,
-                'eid': '0',
+                'eid': 0,
                 '__redirect': _router.current_url(),
             })
             title = _lang.t('odm_ui@create')

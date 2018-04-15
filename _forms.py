@@ -154,7 +154,7 @@ class MassAction(_form.Form):
         if not self.attr('model'):
             raise ValueError('Model is not specified')
 
-        eids = self.attr('eids', [])
+        eids = self.attr('eids', self.attr('ids', []))
         if isinstance(eids, str):
             self.attrs['eids'] = eids.split(',')
 
@@ -170,7 +170,7 @@ class MassAction(_form.Form):
 
         # List of items to process
         ol = _html.Ol()
-        for eid in self.attr('eids'):
+        for eid in self.attr('eids', self.attr('ids', [])):
             entity = dispense_entity(self.attr('model'), eid)
             self.add_widget(_widget.input.Hidden(uid='eids-' + eid, name='eids', value=eid))
             ol.append(_html.Li(entity.odm_ui_mass_action_entity_description()))
@@ -204,7 +204,7 @@ class Delete(MassAction):
         model = self.attr('model')
 
         # Check permissions
-        for eid in self.attr('eids', []):
+        for eid in self.attr('eids', self.attr('ids', [])):
             if not (_odm_auth.check_permission('delete', model) or
                     _odm_auth.check_permission('delete_own', model, eid)):
                 raise _http.error.Forbidden()
@@ -228,7 +228,7 @@ class Delete(MassAction):
 
         try:
             # Ask entities to process deletion
-            for eid in self.attr('eids', []):
+            for eid in self.attr('eids', self.attr('ids', [])):
                 dispense_entity(model, eid).odm_ui_d_form_submit()
 
             _router.session().add_info_message(_lang.t('odm_ui@operation_successful'))

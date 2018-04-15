@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 3.2.4 (2018-04-15)
+
+Processing of request args by mass action forms fixed.
+
+
 ### 3.2.3 (2018-04-15)
 
 Browser's toolbar's delete button presense fixed.
