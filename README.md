@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 3.2.3 (2018-04-15)
+
+Browser's toolbar's delete button presense fixed.
+
+
 ### 3.2.2 (2018-04-15)
 
 Router rules argument names fixed.

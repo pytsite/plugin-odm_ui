@@ -269,7 +269,7 @@ class Browser:
 
     def render(self) -> str:
         # 'Create' toolbar button
-        if self._mock.odm_auth_check_permission('create') and self._mock.odm_ui_creation_allowed():
+        if self._mock.odm_ui_creation_allowed() and self._mock.odm_auth_check_permission('create'):
             create_form_url = _router.rule_url(self._m_form_rule, {
                 'model': self._model,
                 'eid': '0',
@@ -282,10 +282,10 @@ class Browser:
             self._widget.toolbar.append(_html.Span('&nbsp;'))
 
         # 'Delete' toolbar button
-        if self._mock.odm_auth_check_permission('delete') and self._mock.odm_ui_deletion_allowed():
+        if self._mock.odm_ui_deletion_allowed():
             delete_form_url = _router.rule_url(self._d_form_rule, {'model': self._model})
             title = _lang.t('odm_ui@delete_selected')
-            btn = _html.A(href=delete_form_url, css='hidden btn btn-danger mass-action-button', title=title)
+            btn = _html.A(href=delete_form_url, css='hidden btn btn-danger mass-action-button sr-only', title=title)
             btn.append(_html.I(css='fa fa-fw fa-remove'))
             self._widget.toolbar.append(btn)
             self._widget.toolbar.append(_html.Span('&nbsp;'))
