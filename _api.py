@@ -42,10 +42,10 @@ def get_browser(model: str) -> _browser.Browser:
 def get_m_form(model: str, eid: str = None, update_meta_title: bool = True, **kwargs) -> _forms.Modify:
     """Get entity modification form
     """
-    return _forms.Modify(attr_model=model, attr_eid=eid, attr_update_meta_title=update_meta_title, **kwargs)
+    return _forms.Modify(model=model, eid=eid, update_meta_title=update_meta_title, **kwargs)
 
 
 def get_d_form(model: str, eids: _Iterable, **kwargs) -> _form.Form:
     """Get entities delete form
     """
-    return _forms.Delete(attr_model=model, attr_eids=eids, **kwargs)
+    return _forms.Delete(model=model, eids=eids, **kwargs)

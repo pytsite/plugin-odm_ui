@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 3.3 (2018-04-25)
+
+Support of `form-3.0`.
+
+
 ### 3.2.5 (2018-04-15)
 
 Removed unecessary redirect in modify form initialization.
