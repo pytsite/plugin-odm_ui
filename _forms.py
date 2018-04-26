@@ -11,24 +11,12 @@ from . import _model
 
 
 class Modify(_form.Form):
-    @property
-    def update_meta_title(self) -> bool:
-        return self.attr('update_meta_title')
-
-    @update_meta_title.setter
-    def update_meta_title(self, value: bool):
-        self.attrs['update_meta_title'] = value
-
     def _on_setup_form(self):
         """Hook
         """
         model = self.attr('model')
-
         if not model:
             raise ValueError('Model is not specified')
-
-        self.attrs.setdefault('eid', 0)
-        self.attrs.setdefault('update_meta_title', True)
 
         try:
             from ._api import dispense_entity
@@ -36,25 +24,24 @@ class Modify(_form.Form):
         except _odm.error.EntityNotFound:
             raise _http.error.NotFound()
 
-        # Check if entities of this model can be created
         if entity.is_new:
+            # Check if entities of this model can be created
             perms_allow = entity.odm_auth_check_permission('create')
             odm_ui_allows = entity.odm_ui_creation_allowed()
             if not (perms_allow and odm_ui_allows):
                 raise _http.error.Forbidden()
 
-        # Check if the entity can be modified
-        if not entity.is_new:
+            # Setup form title
+            self.title = entity.t('odm_ui_form_title_create_' + model)
+        else:
+            # Check if the entity can be modified
             perms_allow = entity.odm_auth_check_permission('modify') or entity.odm_auth_check_permission('modify_own')
             odm_ui_allows = entity.odm_ui_modification_allowed()
             if not (perms_allow and odm_ui_allows):
                 raise _http.error.Forbidden()
 
-        # Form title
-        if entity.is_new:
-            self._title = entity.t('odm_ui_form_title_create_' + model)
-        else:
-            self._title = entity.t('odm_ui_form_title_modify_' + model)
+            # Setup form title
+            self.title = entity.t('odm_ui_form_title_modify_' + model)
 
         # Setting up the form through entity hook and global event
         entity.odm_ui_m_form_setup(self)
@@ -151,7 +138,8 @@ class MassAction(_form.Form):
         """
         super()._on_setup_form()
 
-        if not self.attr('model'):
+        model = self.attr('model')
+        if not model:
             raise ValueError('Model is not specified')
 
         eids = self.attr('eids', self.attr('ids', []))
@@ -160,7 +148,6 @@ class MassAction(_form.Form):
 
         if not self.redirect:
             from ._api import get_model_class
-            model = self.attr('model')
             self.redirect = _router.rule_url(get_model_class(model).odm_ui_browse_rule(), {'model': model})
 
     def _on_setup_widgets(self):

@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 3.3.1 (2018-04-26)
+
+Forms title setting fixed.
+
+
 ### 3.3 (2018-04-25)
 
 Support of `form-3.0`.

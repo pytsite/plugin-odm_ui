@@ -39,10 +39,10 @@ def get_browser(model: str) -> _browser.Browser:
     return _browser.Browser(model)
 
 
-def get_m_form(model: str, eid: str = None, update_meta_title: bool = True, **kwargs) -> _forms.Modify:
+def get_m_form(model: str, eid: str = None, **kwargs) -> _forms.Modify:
     """Get entity modification form
     """
-    return _forms.Modify(model=model, eid=eid, update_meta_title=update_meta_title, **kwargs)
+    return _forms.Modify(model=model, eid=eid, **kwargs)
 
 
 def get_d_form(model: str, eids: _Iterable, **kwargs) -> _form.Form:
