@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 3.4 (2018-05-06)
+
+Support of `form-4.0` and PytSite-7.17.
+
+
 ### 3.3.1 (2018-04-26)
 
 Forms title setting fixed.

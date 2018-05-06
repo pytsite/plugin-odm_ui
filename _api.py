@@ -5,6 +5,7 @@ __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
 from typing import Iterable as _Iterable, Type as _Type
+from pytsite import router as _router
 from plugins import odm as _odm, odm_auth as _odm_auth, form as _form
 from . import _model, _forms, _browser
 
@@ -42,10 +43,10 @@ def get_browser(model: str) -> _browser.Browser:
 def get_m_form(model: str, eid: str = None, **kwargs) -> _forms.Modify:
     """Get entity modification form
     """
-    return _forms.Modify(model=model, eid=eid, **kwargs)
+    return _forms.Modify(_router.request(), model=model, eid=eid, **kwargs)
 
 
 def get_d_form(model: str, eids: _Iterable, **kwargs) -> _form.Form:
     """Get entities delete form
     """
-    return _forms.Delete(model=model, eids=eids, **kwargs)
+    return _forms.Delete(_router.request(), model=model, eids=eids, **kwargs)

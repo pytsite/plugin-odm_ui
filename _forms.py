@@ -126,7 +126,7 @@ class Modify(_form.Form):
         if self.redirect == 'ENTITY_VIEW':
             self.redirect = entity.odm_ui_view_url()
 
-        return _http.response.Redirect(self.redirect)
+        return _http.RedirectResponse(self.redirect)
 
 
 class MassAction(_form.Form):
@@ -144,7 +144,7 @@ class MassAction(_form.Form):
 
         eids = self.attr('eids', self.attr('ids', []))
         if isinstance(eids, str):
-            self.attrs['eids'] = eids.split(',')
+            self.set_attr('eids', eids.split(','))
 
         if not self.redirect:
             from ._api import get_model_class
@@ -225,4 +225,4 @@ class Delete(MassAction):
             _logger.error(e)
             _router.session().add_error_message(_lang.t('odm_ui@entity_deletion_forbidden') + '. ' + str(e))
 
-        return _http.response.Redirect(self.redirect)
+        return _http.RedirectResponse(self.redirect)
