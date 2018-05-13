@@ -134,7 +134,6 @@ class EntityCheckboxes(_widget.select.Checkboxes):
         """
         super().__init__(uid, **kwargs)
 
-        self.set_val(kwargs.get('value'))
         self._model = kwargs.get('model')
         self._caption_field = kwargs.get('caption_field')
         self._sort_field = kwargs.get('sort_field', self._caption_field)

@@ -4,8 +4,8 @@ __author__ = 'Alexander Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
-from pytsite import lang as _lang, http as _http, events as _events, metatag as _metatag, router as _router, \
-    html as _html, logger as _logger, errors as _errors
+from pytsite import lang as _lang, http as _http, events as _events, router as _router, html as _html, \
+    logger as _logger, errors as _errors
 from plugins import widget as _widget, form as _form, odm as _odm, odm_auth as _odm_auth
 from . import _model
 
@@ -46,9 +46,6 @@ class Modify(_form.Form):
         # Setting up the form through entity hook and global event
         entity.odm_ui_m_form_setup(self)
         _events.fire('odm_ui@m_form_setup.{}'.format(model), frm=self, entity=entity)
-
-        if self.attr('update_meta_title'):
-            _metatag.t_set('title', self.title)
 
         # Redirect
         if not self.redirect:
@@ -196,9 +193,9 @@ class Delete(MassAction):
                     _odm_auth.check_permission('delete_own', model, eid)):
                 raise _http.error.Forbidden()
 
-        # Page title
+        # Form title
         model_class = _odm.get_model_class(model)  # type: _model.UIEntity
-        _metatag.t_set('title', model_class.t('odm_ui_form_title_delete_' + model))
+        self.title = model_class.t('odm_ui_form_title_delete_' + model)
 
     def _on_setup_widgets(self):
         """Hook.
