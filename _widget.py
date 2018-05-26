@@ -4,7 +4,7 @@ __author__ = 'Alexander Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
-from typing import List as _List, Tuple as _Tuple, Callable as _Callable, Iterable as _Iterable
+from typing import List as _List, Tuple as _Tuple, Callable as _Callable, Iterable as _Iterable, Union as _Union
 from bson.dbref import DBRef as _DBRef
 from pyuca import Collator as _Collator
 from pytsite import lang as _lang
@@ -51,7 +51,7 @@ class EntitySelect(_widget.select.Select):
 
         self._mock = _odm.dispense(self._model)
 
-        self._caption_field = kwargs.get('caption_field')
+        self._caption_field = kwargs.get('caption_field')  # type: _Union[str, _Callable[[_odm.Finder], None]]
         if not self._caption_field:
             raise ValueError('Caption field is not specified')
 
@@ -91,7 +91,13 @@ class EntitySelect(_widget.select.Select):
         return finder
 
     def _get_caption(self, entity: _odm.model.Entity) -> str:
-        caption = str(entity.f_get(self._caption_field))
+        if isinstance(self._caption_field, str):
+            caption = str(entity.f_get(self._caption_field))
+        elif callable(self._caption_field):
+            caption = self._caption_field(entity)
+        else:
+            raise TypeError('Caption field must be a string or a callable, got {}'.format(type(self._caption_field)))
+
         if self._caption_adjust:
             caption = self._caption_adjust(caption)
 

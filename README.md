@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 3.5 (2018-05-26)
+
+Support `caption_field` as a callable in `widget.EntitySelect`.
+
+
 ### 3.4.1 (2018-05-13)
 
 Forms titles issue fixed.
