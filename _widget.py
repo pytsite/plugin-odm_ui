@@ -55,7 +55,10 @@ class EntitySelect(_widget.select.Select):
         if not self._caption_field:
             raise ValueError('Caption field is not specified')
 
-        self._sort_field = kwargs.get('sort_field', self._caption_field)  # type: str
+        self._sort_field = kwargs.get('sort_field')  # type: str
+        if not self._sort_field and isinstance(self._caption_field, str):
+            self._sort_field = self._caption_field
+
         self._sort_order = kwargs.get('sort_order', _odm.I_ASC)  # type: int
         self._finder_adjust = kwargs.get('finder_adjust')  # type: _Callable[[_odm.Finder], None]
         self._caption_adjust = kwargs.get('caption_adjust')  # type: _Callable[[str], None]
@@ -83,7 +86,9 @@ class EntitySelect(_widget.select.Select):
         return super().set_val(value)
 
     def _get_finder(self) -> _odm.Finder:
-        finder = _odm.find(self._model).sort([(self._sort_field, self._sort_order)])
+        finder = _odm.find(self._model)
+        if self._sort_field:
+            finder.sort([(self._sort_field, self._sort_order)])
 
         if self._finder_adjust:
             self._finder_adjust(finder)

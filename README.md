@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 3.5.2 (2018-05-26)
+
+Sorting issues fixed in `widget.EntitySelect`.
+
+
 ### 3.5.1 (2018-05-26)
 
 Type hinting fixed.
