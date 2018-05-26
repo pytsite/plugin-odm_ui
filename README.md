@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 3.5.1 (2018-05-26)
+
+Type hinting fixed.
+
+
 ### 3.5 (2018-05-26)
 
 Support `caption_field` as a callable in `widget.EntitySelect`.

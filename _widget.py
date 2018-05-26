@@ -51,14 +51,14 @@ class EntitySelect(_widget.select.Select):
 
         self._mock = _odm.dispense(self._model)
 
-        self._caption_field = kwargs.get('caption_field')  # type: _Union[str, _Callable[[_odm.Finder], None]]
+        self._caption_field = kwargs.get('caption_field')  # type: _Union[str, _Callable[[_odm.Entity], None]]
         if not self._caption_field:
             raise ValueError('Caption field is not specified')
 
         self._sort_field = kwargs.get('sort_field', self._caption_field)  # type: str
         self._sort_order = kwargs.get('sort_order', _odm.I_ASC)  # type: int
         self._finder_adjust = kwargs.get('finder_adjust')  # type: _Callable[[_odm.Finder], None]
-        self._caption_adjust = kwargs.get('caption_adjust')  # type: _Callable[[_odm.Finder], None]
+        self._caption_adjust = kwargs.get('caption_adjust')  # type: _Callable[[str], None]
         self._advanced_sort = kwargs.get('advanced_sort', True)  # type: bool
 
     @property
