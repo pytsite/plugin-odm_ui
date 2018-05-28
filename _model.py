@@ -189,7 +189,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
                     weight=weight,
                     label=self.t(uid),
                     required=field.required,
-                    items=[(x, self.t(x)) for x in field.valid_values],
+                    items=[(x, self.t(x)) for x in field.values],
                     default=field.default,
                     value=field.get_val(),
                 ))

@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 3.6 (2018-05-28)
+
+Support of `odm-3.6`.
+
+
 ### 3.5.2 (2018-05-26)
 
 Sorting issues fixed in `widget.EntitySelect`.
