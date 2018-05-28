@@ -13,7 +13,7 @@
     "url": "https://shepetko.com"
   },
   "requires": {
-    "pytsite": ">=7.17",
+    "pytsite": ">=7.22",
     "packages": [
       "pyuca"
     ],

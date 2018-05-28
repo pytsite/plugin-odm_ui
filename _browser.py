@@ -37,7 +37,7 @@ class Browser:
             raise TypeError('Subclass of {} expected, got'.format(_widget.misc.DataTable, widget_class))
         self._widget = widget_class(
             uid='odm-ui-browser-' + model,
-            rows_url=_http_api.url('odm_ui@get_rows', {'model': self._model}),
+            rows_url=_http_api.url('odm_ui@admin_browse_get_rows', {'model': self._model}),
         )
 
         # Check permissions
