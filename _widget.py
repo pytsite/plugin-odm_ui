@@ -4,11 +4,12 @@ __author__ = 'Alexander Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
-from typing import List as _List, Tuple as _Tuple, Callable as _Callable, Iterable as _Iterable, Union as _Union
+from typing import List as _List, Tuple as _Tuple, Callable as _Callable, Iterable as _Iterable, Union as _Union, \
+    Optional as _Optional
 from bson.dbref import DBRef as _DBRef
 from pyuca import Collator as _Collator
 from pytsite import lang as _lang
-from plugins import widget as _widget, odm as _odm
+from plugins import widget as _widget, odm as _odm, http_api as _http_api
 
 _pyuca_col = _Collator()
 
@@ -210,5 +211,47 @@ class EntityCheckboxes(_widget.select.Checkboxes):
                 if self._translate_captions:
                     caption = _lang.t(caption)
                 self._items.append((k, caption))
+
+        return super()._get_element()
+
+
+class EntitySelectSearch(_widget.select.Select2):
+    """Entity Select
+    """
+
+    def __init__(self, uid: str, **kwargs):
+        model = kwargs.get('model')
+        if not model:
+            raise ValueError('Model is not specified')
+
+        kwargs['ajax_url'] = _http_api.url('odm_ui@widget_entity_select_search', {'model': model})
+
+        super().__init__(uid, **kwargs)
+
+    def set_val(self, value):
+        if value in (None, ''):
+            return super().set_val(None)
+
+        e = _odm.get_by_ref(value)
+        if not isinstance(e, _odm.Entity):
+            raise TypeError('Instance of {} expected, got {}'.format(_odm.Entity, type(e)))
+
+        return super().set_val(e.manual_ref)
+
+    def get_val(self) -> _Optional[_odm.Entity]:
+        if not self._value:
+            return None
+
+        e = _odm.get_by_ref(self._value)
+        if not isinstance(e, _odm.Entity):
+            raise TypeError('Instance of {} expected, got {}'.format(_odm.Entity, type(e)))
+
+        return e
+
+    def _get_element(self, **kwargs):
+        # In AJAX-mode Select2 doesn't contain any items,
+        # but if we have selected item, it is necessary to append it
+        if self._ajax_url and self._value:
+            self._items.append((self._value, _odm.get_by_ref(self._value).f_get('title')))
 
         return super()._get_element()

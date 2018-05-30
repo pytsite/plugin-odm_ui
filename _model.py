@@ -4,7 +4,7 @@ __author__ = 'Alexander Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
-from typing import Tuple as _Tuple, Dict as _Dict, Type as _Type
+from typing import Tuple as _Tuple, Dict as _Dict, Type as _Type, List as _List
 from pytsite import router as _router, lang as _lang
 from plugins import widget as _widget, odm as _odm, odm_auth as _odm_auth, form as _form
 
@@ -91,6 +91,9 @@ class UIEntity(_odm_auth.model.OwnedEntity):
     def odm_ui_browse_url(self, args: dict = None):
         """Get browse URL
         """
+        if args is None:
+            args = {}
+
         args.update({
             'model': self.model
         })
@@ -265,6 +268,19 @@ class UIEntity(_odm_auth.model.OwnedEntity):
         })
 
         return _router.rule_url(self.odm_ui_view_rule(), args)
+
+    @classmethod
+    def odm_ui_widget_select_search_entities(cls, args: dict) -> _List[_Dict[str, str]]:
+        """Get data for widget.EntitySelectSearch
+
+        Each list item in return value must be a dict which contains two keys: 'id' and 'text',
+        where 'id' must contain entity's manual_ref and 'text' -- what should be shown to the user.
+        """
+        raise NotImplementedError('Not implemented yet')
+
+    @property
+    def odm_ui_widget_select_search_entities_title(self):
+        raise NotImplementedError('Not implemented yet')
 
     @property
     def url(self) -> str:

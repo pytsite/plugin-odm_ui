@@ -5,10 +5,11 @@ __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
 from pytsite import routing as _routing, formatters as _formatters, validation as _validation
+from plugins import odm as _odm
 from . import _browser
 
 
-class AdminBrowseGetRows(_routing.Controller):
+class GetAdminBrowseRows(_routing.Controller):
     """Get browser rows
     """
 
@@ -27,3 +28,13 @@ class AdminBrowseGetRows(_routing.Controller):
             self.arg('order', 'asc'),
             self.arg('search')
         )
+
+
+class GetWidgetEntitySelectSearch(_routing.Controller):
+    def exec(self) -> dict:
+        # Check if the model's class supports this operation
+        cls = _odm.get_model_class(self.arg('model'))
+        if not hasattr(cls, 'odm_ui_widget_select_search_entities'):
+            raise self.not_found()
+
+        return {'results': cls.odm_ui_widget_select_search_entities(self.args)}

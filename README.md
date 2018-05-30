@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 3.8 (2018-05-30)
+
+New widget `EntitySelectSearch`.
+
+
 ### 3.7 (2018-05-28)
 
 Support of `pytsite-7.22`.
@@ -36,7 +41,7 @@ Forms titles issue fixed.
 
 ### 3.4 (2018-05-06)
 
-Support of `form-4.0` and PytSite-7.17.
+Support of `form-4.0` and `pytsite-7.17`.
 
 
 ### 3.3.1 (2018-04-26)
@@ -220,7 +225,7 @@ Typo fixed.
 
 ### 1.6 (2018-02-11)
 
-- Support for PytSite-7.9.
+- Support for `pytsite-7.9`.
 - New event `odm_ui@browser_setup.{model}` added.
 
 
@@ -256,12 +261,12 @@ Init code refactored.
 
 ### 1.2 (2017-12-13)
 
-Support for PytSite-7.0.
+Support for `pytsite-7.0`.
 
 
 ### 1.1 (2017-12-02)
 
-Support for PytSite-6.1.
+Support for `pytsite-6.1`.
 
 
 ### 1.0.1 (2017-11-27)

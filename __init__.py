@@ -48,5 +48,7 @@ def plugin_load_wsgi():
                   methods=('GET', 'POST'), filters=auth_ui.AuthFilterController)
 
     # HTTP API handlers
-    http_api.handle('GET', 'odm_ui/browse/rows/<model>', _http_api_controllers.AdminBrowseGetRows,
-                    'odm_ui@admin_browse_get_rows')
+    http_api.handle('GET', 'odm_ui/admin/browse/rows/<model>', _http_api_controllers.GetAdminBrowseRows,
+                    'odm_ui@admin_browse_rows')
+    http_api.handle('GET', 'odm_ui/widget/entity_select_search/<model>',
+                    _http_api_controllers.GetWidgetEntitySelectSearch, 'odm_ui@widget_entity_select_search')

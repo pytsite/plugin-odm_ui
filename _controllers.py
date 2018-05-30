@@ -4,7 +4,7 @@ __author__ = 'Alexander Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
-from pytsite import tpl as _tpl, router as _router, routing as _routing, metatag as _metatag
+from pytsite import tpl as _tpl, router as _router, routing as _routing, metatag as _metatag, errors as _errors
 from plugins import odm as _odm, admin as _admin
 from . import _api
 
@@ -28,8 +28,8 @@ class ModifyForm(_routing.Controller):
             _metatag.t_set('title', form.title)
             return _admin.render(_tpl.render('odm_ui@form', {'form': form}))
 
-        except _odm.error.EntityNotFound:
-            raise self.not_found()
+        except _errors.NotFound as e:
+            raise self.not_found(e)
 
 
 class DeleteForm(_routing.Controller):
