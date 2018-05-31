@@ -252,6 +252,10 @@ class EntitySelectSearch(_widget.select.Select2):
         # In AJAX-mode Select2 doesn't contain any items,
         # but if we have selected item, it is necessary to append it
         if self._ajax_url and self._value:
-            self._items.append((self._value, _odm.get_by_ref(self._value).f_get('title')))
+            entity = _odm.get_by_ref(self._value)
+            if hasattr(entity, 'odm_ui_widget_select_search_entities_title'):
+                self._items.append((self._value, entity.odm_ui_widget_select_search_entities_title))
+            else:
+                raise ValueError("Entity '{}' does not support this operation".format(type(entity)))
 
         return super()._get_element()

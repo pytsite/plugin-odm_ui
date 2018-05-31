@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 3.8.1 (2018-05-31)
+
+`widget.EntitySelectSearch` fixed.
+
+
 ### 3.8 (2018-05-30)
 
 New widget `EntitySelectSearch`.
