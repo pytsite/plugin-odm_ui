@@ -50,8 +50,6 @@ class EntitySelect(_widget.select.Select):
         if not self._model:
             raise ValueError('Model is not specified')
 
-        self._mock = _odm.dispense(self._model)
-
         self._caption_field = kwargs.get('caption_field')  # type: _Union[str, _Callable[[_odm.Entity], None]]
         if not self._caption_field:
             raise ValueError('Caption field is not specified')
@@ -61,9 +59,8 @@ class EntitySelect(_widget.select.Select):
             self._sort_field = self._caption_field
 
         self._sort_order = kwargs.get('sort_order', _odm.I_ASC)  # type: int
+
         self._finder_adjust = kwargs.get('finder_adjust')  # type: _Callable[[_odm.Finder], None]
-        self._caption_adjust = kwargs.get('caption_adjust')  # type: _Callable[[str], None]
-        self._advanced_sort = kwargs.get('advanced_sort', True)  # type: bool
 
     @property
     def sort_field(self) -> str:
@@ -72,6 +69,14 @@ class EntitySelect(_widget.select.Select):
     @sort_field.setter
     def sort_field(self, value: str):
         self._sort_field = value
+
+    @property
+    def sort_order(self) -> int:
+        return self._sort_order
+
+    @sort_order.setter
+    def sort_order(self, value: int):
+        self._sort_order = value
 
     def set_val(self, value):
         """Set value of the widget.
@@ -104,9 +109,6 @@ class EntitySelect(_widget.select.Select):
         else:
             raise TypeError('Caption field must be a string or a callable, got {}'.format(type(self._caption_field)))
 
-        if self._caption_adjust:
-            caption = self._caption_adjust(caption)
-
         if entity.depth:
             caption = '-' * entity.depth + ' ' + caption
 
@@ -127,9 +129,10 @@ class EntitySelect(_widget.select.Select):
         """
         root_items = [entity for entity in self._get_finder().eq('_parent', None)]
 
-        if self._advanced_sort and isinstance(self._mock.get_field(self._sort_field), _odm.field.String):
-            rev = True if self._sort_order == _odm.I_DESC else False
-            root_items = sorted(root_items, key=lambda e: _pyuca_col.sort_key(e.f_get(self._sort_field)), reverse=rev)
+        # Do additional sorting of string fields, because MongoDB does not sort properly all languages
+        if self._sort_field and isinstance(_odm.dispense(self._model).get_field(self._sort_field), _odm.field.String):
+            root_items = sorted(root_items, key=lambda e: _pyuca_col.sort_key(e.f_get(self._sort_field)),
+                                reverse=True if self._sort_order == _odm.I_DESC else False)
 
         for item in self._build_items_tree(root_items):
             self._items.append((item[0], item[1]))
@@ -147,33 +150,49 @@ class EntityCheckboxes(_widget.select.Checkboxes):
         super().__init__(uid, **kwargs)
 
         self._model = kwargs.get('model')
-        self._caption_field = kwargs.get('caption_field')
-        self._sort_field = kwargs.get('sort_field', self._caption_field)
-        self._translate_captions = kwargs.get('translate_captions', False)
-
         if not self._model:
-            raise ValueError('Model is not specified.')
+            raise ValueError('Model is not specified')
+
+        self._caption_field = kwargs.get('caption_field')  # type: _Union[str, _Callable[[_odm.Entity], None]]
         if not self._caption_field:
-            raise ValueError('Caption field is not specified.')
+            raise ValueError('Caption field is not specified')
+
+        self._sort_field = kwargs.get('sort_field')  # type: str
+        if not self._sort_field and isinstance(self._caption_field, str):
+            self._sort_field = self._caption_field
+
+        self._translate_captions = kwargs.get('translate_captions', False)
 
         self._exclude = []  # type: _List[_odm.model.Entity]
         for e in kwargs.get('exclude', ()):
             self._exclude.append(_odm.get_by_ref(_odm.resolve_ref(e)))
+
+        self._sort_order = kwargs.get('sort_order', _odm.I_ASC)  # type: int
+
+        self._finder_adjust = kwargs.get('finder_adjust')  # type: _Callable[[_odm.Finder], None]
 
         # Available items will be set during call to self._get_element()
         self._items = []
 
     @property
     def sort_field(self) -> str:
-        """Get sort field.
+        """Get sort field
         """
         return self._sort_field
 
     @sort_field.setter
     def sort_field(self, value: str):
-        """Set sort field.
+        """Set sort field
         """
         self._sort_field = value
+
+    @property
+    def sort_order(self) -> int:
+        return self._sort_order
+
+    @sort_order.setter
+    def sort_order(self, value: int):
+        self._sort_order = value
 
     def set_val(self, value):
         """Set value of the widget.
@@ -186,7 +205,7 @@ class EntityCheckboxes(_widget.select.Checkboxes):
             value = [value] if value else []
 
         if not isinstance(value, (list, tuple)):
-            raise TypeError("List of entities expected as a value of the widget '{}'.".format(self.name))
+            raise TypeError("List of entities expected as a value of the widget '{}'".format(self.name))
 
         clean_val = []
         for v in value:
@@ -203,14 +222,30 @@ class EntityCheckboxes(_widget.select.Checkboxes):
         return super().set_val(clean_val)
 
     def _get_element(self, **kwargs):
-        finder = _odm.find(self._model).sort([(self._sort_field, _odm.I_ASC)])
-        for entity in finder.get():
-            k = str(entity)
-            if k not in self._exclude:
-                caption = str(entity.get_field(self._caption_field))
-                if self._translate_captions:
-                    caption = _lang.t(caption)
-                self._items.append((k, caption))
+        f = _odm.find(self._model)
+
+        if self._sort_field:
+            f.sort([(self._sort_field, self._sort_order)])
+
+        if self._finder_adjust:
+            self._finder_adjust(f)
+
+        entities = []
+        for e in f:
+            if str(e) not in self._exclude:
+                entities.append(e)
+
+        # Do additional sorting of string fields, because MongoDB does not sort properly all languages
+        if self._sort_field and isinstance(_odm.dispense(self._model).get_field(self._sort_field), _odm.field.String):
+            rev = True if self._sort_order == _odm.I_DESC else False
+            entities = sorted(entities, key=lambda e: _pyuca_col.sort_key(e.f_get(self._sort_field)), reverse=rev)
+
+        for e in entities:
+            caption = self._caption_field(e) if callable(self._caption_field) else e.get_field(self._caption_field)
+            if self._translate_captions:
+                caption = _lang.t(caption)
+
+            self._items.append((str(e), str(caption)))
 
         return super()._get_element()
 

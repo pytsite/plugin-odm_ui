@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 3.9 (2018-06-03)
+
+`EntitySelect` and `EntityCheckboxes` widgets refactored.
+
+
 ### 3.8.1 (2018-05-31)
 
 `widget.EntitySelectSearch` fixed.
