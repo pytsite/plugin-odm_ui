@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 3.10 (2018-06-07)
+
+Support of `auth_ui-3.5`.
+
+
 ### 3.9 (2018-06-03)
 
 `EntitySelect` and `EntityCheckboxes` widgets refactored.
