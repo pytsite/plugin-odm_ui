@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 3.11 (2018-06-24)
+
+Support of `odm_auth-1.8`.
+
+
 ### 3.10 (2018-06-07)
 
 Support of `auth_ui-3.5`.

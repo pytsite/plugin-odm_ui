@@ -35,7 +35,7 @@ class Modify(_form.Form):
             self.title = entity.t('odm_ui_form_title_create_' + model)
         else:
             # Check if the entity can be modified
-            perms_allow = entity.odm_auth_check_permission('modify') or entity.odm_auth_check_permission('modify_own')
+            perms_allow = entity.odm_auth_check_permission('modify')
             odm_ui_allows = entity.odm_ui_modification_allowed()
             if not (perms_allow and odm_ui_allows):
                 raise _http.error.Forbidden()
@@ -189,8 +189,7 @@ class Delete(MassAction):
 
         # Check permissions
         for eid in self.attr('eids', self.attr('ids', [])):
-            if not (_odm_auth.check_permission('delete', model) or
-                    _odm_auth.check_permission('delete_own', model, eid)):
+            if not _odm_auth.check_permission('delete', model, eid):
                 raise _http.error.Forbidden()
 
         # Form title

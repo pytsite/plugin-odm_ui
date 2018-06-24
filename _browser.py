@@ -239,8 +239,7 @@ class Browser:
         """
         group = _html.Div(css='entity-actions', data_entity_id=str(entity.id))
 
-        if entity.odm_ui_modification_allowed() and \
-                (entity.odm_auth_check_permission('modify') or entity.odm_auth_check_permission('modify_own')):
+        if entity.odm_ui_modification_allowed() and entity.odm_auth_check_permission('modify'):
             m_form_url = _router.rule_url(self._m_form_rule, {
                 'model': entity.model,
                 'eid': str(entity.id),
@@ -252,8 +251,7 @@ class Browser:
             group.append(a)
             group.append(_html.TagLessElement('&nbsp;'))
 
-        if entity.odm_ui_deletion_allowed() and \
-                (entity.odm_auth_check_permission('delete') or entity.odm_auth_check_permission('delete_own')):
+        if entity.odm_ui_deletion_allowed() and entity.odm_auth_check_permission('delete'):
             d_form_url = _router.rule_url(self._d_form_rule, {
                 'model': entity.model,
                 'eids': str(entity.id),
