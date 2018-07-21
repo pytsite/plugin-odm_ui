@@ -215,7 +215,7 @@ class Browser:
                     (self._model_class.odm_ui_modification_allowed() or self._model_class.odm_ui_deletion_allowed()):
                 actions = self._get_entity_action_buttons(entity)
                 for btn_data in entity.odm_ui_browser_entity_actions():
-                    color = 'btn btn-xs btn-' + btn_data.get('color', 'default')
+                    color = 'btn btn-sm btn-' + btn_data.get('color', 'default btn-light')
                     title = btn_data.get('title', '')
                     ep = btn_data.get('ep')
                     url = _router.rule_url(ep, {'eids': str(entity.id)}) if ep else '#'
@@ -246,8 +246,8 @@ class Browser:
                 '__redirect': _router.rule_url(self._browse_rule, {'model': entity.model}),
             })
             title = _lang.t('odm_ui@modify')
-            a = _html.A(css='btn btn-xs btn-default', href=m_form_url, title=title)
-            a.append(_html.I(css='fa fa-edit'))
+            a = _html.A(css='btn btn-sm btn-default btn-light', href=m_form_url, title=title)
+            a.append(_html.I(css='fa fas fa-edit'))
             group.append(a)
             group.append(_html.TagLessElement('&nbsp;'))
 
@@ -258,8 +258,8 @@ class Browser:
                 '__redirect': _router.rule_url(self._browse_rule, {'model': entity.model}),
             })
             title = _lang.t('odm_ui@delete')
-            a = _html.A(css='btn btn-xs btn-danger', href=d_form_url, title=title)
-            a.append(_html.I(css='fa fa-remove'))
+            a = _html.A(css='btn btn-sm btn-danger', href=d_form_url, title=title)
+            a.append(_html.I(css='fa fas fa-remove fa-times'))
             group.append(a)
             group.append(_html.TagLessElement('&nbsp;'))
 
@@ -274,7 +274,7 @@ class Browser:
                 '__redirect': _router.current_url(),
             })
             title = _lang.t('odm_ui@create')
-            btn = _html.A(href=create_form_url, css='btn btn-default add-button', title=title)
+            btn = _html.A(href=create_form_url, css='btn btn-default btn-light add-button', title=title)
             btn.append(_html.I(css='fa fa-fw fa-plus'))
             self._widget.toolbar.append(btn)
             self._widget.toolbar.append(_html.Span('&nbsp;'))
@@ -292,7 +292,7 @@ class Browser:
         for btn_data in self._model_class.odm_ui_browser_mass_action_buttons():
             ep = btn_data.get('ep')
             url = _router.rule_url(ep) if ep else '#'
-            css = 'btn btn-{} mass-action-button'.format(btn_data.get('color', 'default'))
+            css = 'btn btn-{} mass-action-button'.format(btn_data.get('color', 'default btn-light'))
             icon = 'fa fa-fw fa-' + btn_data.get('icon', 'question')
             button = _html.A(href=url, css=css, title=btn_data.get('title'))
             if icon:

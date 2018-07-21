@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 3.12.1 (2018-07-21)
+
+Support of Twitter Bootstrap 4 fixed.
+
+
 ### 3.12 (2018-07-07)
 
 Support of `form-4.4`.
