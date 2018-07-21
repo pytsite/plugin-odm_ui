@@ -80,7 +80,7 @@ class Modify(_form.Form):
                 form_area='hidden',
             ))
 
-        # Cancel button
+        # Cancel button URL
         cancel_href = self.redirect
         if not cancel_href or cancel_href == 'ENTITY_VIEW':
             if not entity.is_new and entity.odm_ui_view_url():
@@ -88,14 +88,19 @@ class Modify(_form.Form):
             else:
                 cancel_href = _router.base_url()
 
+        # Cancel button
         self.add_widget(_widget.button.Link(
             weight=15,
             uid='action_cancel_' + str(self.current_step),
             value=_lang.t('odm_ui@cancel'),
-            icon='fa fas fa-remove fa-times',
+            icon='fa fas fa-fw fa-remove fa-times',
             href=cancel_href,
             form_area='footer',
         ))
+
+        # Submit button
+        submit_btn = self.get_widget('action_submit')
+        submit_btn.icon = 'fa fas fa-fw fa-save'
 
     def _on_validate(self):
         # Ask entity to validate the form
