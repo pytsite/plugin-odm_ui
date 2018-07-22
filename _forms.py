@@ -98,10 +98,6 @@ class Modify(_form.Form):
             form_area='footer',
         ))
 
-        # Submit button
-        submit_btn = self.get_widget('action_submit')
-        submit_btn.icon = 'fa fas fa-fw fa-save'
-
     def _on_validate(self):
         # Ask entity to validate the form
         from ._api import dispense_entity
