@@ -16,6 +16,7 @@ def plugin_load():
 
     assetman.register_package(__name__)
     assetman.t_less(__name__)
+    assetman.t_js(__name__)
 
 
 def plugin_install():

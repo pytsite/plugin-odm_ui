@@ -4,6 +4,12 @@
 ## Changelog
 
 
+### 3.13 (2018-07-29)
+
+- Changed form closing confirmation added.
+- Support of `form-4.7`.
+
+
 ### 3.12.3 (2018-07-22)
 
 Form icons fix.

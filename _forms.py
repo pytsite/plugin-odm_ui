@@ -51,8 +51,11 @@ class Modify(_form.Form):
         if not self.redirect:
             self.redirect = 'ENTITY_VIEW'
 
+        # Assets
+        self.assets.append('odm_ui@js/form.js')
+
         # CSS
-        self.css += ' odm-ui-form odm-ui-form-' + model
+        self.css += ' odm-ui-form odm-ui-m-form odm-ui-form-' + model
 
     def _on_setup_widgets(self):
         from ._api import dispense_entity
@@ -90,8 +93,8 @@ class Modify(_form.Form):
 
         # Cancel button
         self.add_widget(_widget.button.Link(
-            weight=15,
             uid='action_cancel_' + str(self.current_step),
+            weight=150,
             value=_lang.t('odm_ui@cancel'),
             icon='fa fas fa-fw fa-remove fa-times',
             href=cancel_href,
@@ -145,6 +148,8 @@ class MassAction(_form.Form):
             from ._api import get_model_class
             self.redirect = _router.rule_url(get_model_class(model).odm_ui_browse_rule(), {'model': model})
 
+        self.css += ' odm-ui-mass-action-form'
+
     def _on_setup_widgets(self):
         """Hook.
         """
@@ -166,7 +171,7 @@ class MassAction(_form.Form):
         # Cancel button
         self.add_widget(_widget.button.Link(
             uid='action_cancel',
-            weight=10,
+            weight=100,
             value=_lang.t('odm_ui@cancel'),
             href=self.redirect,
             icon='fa fas fa-ban',
@@ -193,6 +198,8 @@ class Delete(MassAction):
         # Form title
         model_class = _odm.get_model_class(model)  # type: _model.UIEntity
         self.title = model_class.t('odm_ui_form_title_delete_' + model)
+
+        self.css += ' odm-ui-mass-d-form'
 
     def _on_setup_widgets(self):
         """Hook.
