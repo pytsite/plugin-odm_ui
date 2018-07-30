@@ -124,8 +124,6 @@ class Modify(_form.Form):
         if self.redirect == 'ENTITY_VIEW':
             self.redirect = entity.odm_ui_view_url()
 
-        return _http.RedirectResponse(self.redirect)
-
 
 class MassAction(_form.Form):
     """ODM UI Mass Action Form.
@@ -225,5 +223,3 @@ class Delete(MassAction):
         except _errors.ForbidDeletion as e:
             _logger.error(e)
             _router.session().add_error_message(_lang.t('odm_ui@entity_deletion_forbidden') + '. ' + str(e))
-
-        return _http.RedirectResponse(self.redirect)

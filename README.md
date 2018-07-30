@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 3.14 (2018-07-30)
+
+Support of `form-4.8`.
+
+
 ### 3.13 (2018-07-29)
 
 - Changed form closing confirmation added.
