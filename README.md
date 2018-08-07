@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 3.15 (2018-08-08)
+
+Support of `form-4.12`.
+
+
 ### 3.14 (2018-07-30)
 
 Support of `form-4.8`.

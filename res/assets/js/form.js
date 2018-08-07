@@ -1,7 +1,7 @@
-$('.odm-ui-m-form').on('formForward', function() {
+$('.odm-ui-m-form').on('forward:form:pytsite', function() {
     const form = $(this);
 
-    form.on('formSubmit', function() {
+    form.on('submit:form:pytsite', function() {
         form.attr('data-changed', false);
     });
 
