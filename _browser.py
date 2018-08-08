@@ -1,12 +1,11 @@
 """PytSite Object Document Mapper UI Plugin Entities Browser
 """
-__author__ = 'Alexander Shepetko'
+__author__ = 'Oleksandr Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
 from typing import Callable as _Callable, Union as _Union
-from pytsite import router as _router, metatag as _metatag, lang as _lang, html as _html, http as _http, \
-    events as _events
+from pytsite import router as _router, metatag as _metatag, lang as _lang, html as _html, events as _events
 from plugins import widget as _widget, auth as _auth, odm as _odm, permissions as _permissions, http_api as _http_api, \
     assetman as _assetman
 from . import _api, _model
@@ -39,10 +38,6 @@ class Browser:
             uid='odm-ui-browser-' + model,
             rows_url=_http_api.url('odm_ui@admin_browse_rows', {'model': self._model}),
         )
-
-        # Check permissions
-        if not self._mock.odm_auth_check_permission(self._mock.odm_auth_permissions()):
-            raise _http.error.Forbidden()
 
         self._current_user = _auth.get_current_user()
         self._finder_adjust = self._default_finder_adjust

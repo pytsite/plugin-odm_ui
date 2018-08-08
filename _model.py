@@ -1,6 +1,6 @@
 """PytSite Object Document Mapper UI Plugin Models
 """
-__author__ = 'Alexander Shepetko'
+__author__ = 'Oleksandr Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
@@ -291,18 +291,15 @@ class UIEntity(_odm_auth.model.OwnedEntity):
     def as_jsonable(self, **kwargs) -> dict:
         r = super().as_jsonable(**kwargs)
 
-        view_perm = self.odm_auth_check_permission('view')
         modify_perm = self.odm_auth_check_permission('modify')
         delete_perm = self.odm_auth_check_permission('delete')
 
         r['permissions'] = {
-            'view': view_perm,
             'modify': modify_perm,
             'delete': delete_perm,
         }
 
-        if view_perm:
-            r['url'] = self.url
+        r['url'] = self.url
 
         if modify_perm:
             r['modify_url'] = self.modify_url
