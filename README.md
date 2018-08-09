@@ -4,6 +4,12 @@
 ## Changelog
 
 
+### 3.17 (2018-08-09)
+
+Support for `Browser`'s constructor arguments to specify router's rules
+names.
+
+
 ### 3.16 (2018-08-09)
 
 Support of `odm_auth-1.9`.

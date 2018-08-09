@@ -34,10 +34,10 @@ def dispense_entity(model: str, entity_id: str = None) -> _model.UIEntity:
     return entity
 
 
-def get_browser(model: str) -> _browser.Browser:
+def get_browser(model: str, **kwargs) -> _browser.Browser:
     """Get entities browser
     """
-    return _browser.Browser(model)
+    return _browser.Browser(model, **kwargs)
 
 
 def get_m_form(model: str, eid: str = None, **kwargs) -> _forms.Modify:

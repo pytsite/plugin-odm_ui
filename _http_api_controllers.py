@@ -9,7 +9,7 @@ from plugins import odm as _odm
 from . import _browser
 
 
-class GetAdminBrowseRows(_routing.Controller):
+class GetBrowseRows(_routing.Controller):
     """Get browser rows
     """
 
@@ -21,7 +21,14 @@ class GetAdminBrowseRows(_routing.Controller):
         self.args.add_validation('order', _validation.rule.Enum(values=['asc', 'desc']))
 
     def exec(self) -> dict:
-        return _browser.Browser(self.arg('model')).get_rows(
+        browser = _browser.Browser(
+            model=self.arg('model'),
+            browse_rule=self.arg('browse_rule'),
+            m_form_rule=self.arg('m_form_rule'),
+            d_form_rule=self.arg('d_form_rule'),
+        )
+
+        return browser.get_rows(
             self.arg('offset', 0),
             self.arg('limit', 0),
             self.arg('sort'),

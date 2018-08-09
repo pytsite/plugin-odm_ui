@@ -15,7 +15,7 @@ class Browser:
     """ODM Entities Browser
     """
 
-    def __init__(self, model: str):
+    def __init__(self, model: str, **kwargs):
         """Init
         """
         if not model:
@@ -30,20 +30,25 @@ class Browser:
         # Entity mock
         self._mock = _api.dispense_entity(self._model)
 
+        self._current_user = _auth.get_current_user()
+        self._finder_adjust = self._default_finder_adjust
+        self._browse_rule = kwargs.get('browse_rule', self._model_class.odm_ui_browse_rule())
+        self._m_form_rule = kwargs.get('m_form_rule', self._model_class.odm_ui_m_form_rule())
+        self._d_form_rule = kwargs.get('d_form_rule', self._model_class.odm_ui_d_form_rule())
+
         # Widget
         widget_class = self._model_class.odm_ui_browser_widget_class()
         if not (issubclass(widget_class, _widget.misc.DataTable)):
             raise TypeError('Subclass of {} expected, got'.format(_widget.misc.DataTable, widget_class))
         self._widget = widget_class(
             uid='odm-ui-browser-' + model,
-            rows_url=_http_api.url('odm_ui@admin_browse_rows', {'model': self._model}),
+            rows_url=_http_api.url('odm_ui@browse_rows', {
+                'model': self._model,
+                'browse_rule': self._browse_rule,
+                'm_form_rule': self._m_form_rule,
+                'd_form_rule': self._d_form_rule,
+            }),
         )
-
-        self._current_user = _auth.get_current_user()
-        self._finder_adjust = self._default_finder_adjust
-        self._browse_rule = self._model_class.odm_ui_browse_rule()
-        self._m_form_rule = self._model_class.odm_ui_m_form_rule()
-        self._d_form_rule = self._model_class.odm_ui_d_form_rule()
 
         # Call model's class to perform setup tasks
         self._model_class.odm_ui_browser_setup(self)
@@ -136,7 +141,7 @@ class Browser:
         self._finder_adjust(finder)
 
         # Admins and developers has full access
-        show_all = self._current_user.has_role(['admin', 'dev'])
+        show_all = self._current_user.is_admin
 
         # Check if the current user is not admin, but have permission-based full access
         if not show_all:
@@ -242,7 +247,7 @@ class Browser:
             })
             title = _lang.t('odm_ui@modify')
             a = _html.A(css='btn btn-sm btn-default btn-light', href=m_form_url, title=title)
-            a.append(_html.I(css='fa fas fa-edit'))
+            a.append(_html.I(css='fa fas fa-fw fa-fw fa-edit'))
             group.append(a)
             group.append(_html.TagLessElement('&nbsp;'))
 
@@ -254,7 +259,7 @@ class Browser:
             })
             title = _lang.t('odm_ui@delete')
             a = _html.A(css='btn btn-sm btn-danger', href=d_form_url, title=title)
-            a.append(_html.I(css='fa fas fa-remove fa-times'))
+            a.append(_html.I(css='fa fas fa-fw fa-remove fa-times'))
             group.append(a)
             group.append(_html.TagLessElement('&nbsp;'))
 
@@ -270,7 +275,7 @@ class Browser:
             })
             title = _lang.t('odm_ui@create')
             btn = _html.A(href=create_form_url, css='btn btn-default btn-light add-button', title=title)
-            btn.append(_html.I(css='fa fa-fw fa-plus'))
+            btn.append(_html.I(css='fa fas fa-fw fa-plus'))
             self._widget.toolbar.append(btn)
             self._widget.toolbar.append(_html.Span('&nbsp;'))
 
@@ -279,7 +284,7 @@ class Browser:
             delete_form_url = _router.rule_url(self._d_form_rule, {'model': self._model})
             title = _lang.t('odm_ui@delete_selected')
             btn = _html.A(href=delete_form_url, css='hidden btn btn-danger mass-action-button sr-only', title=title)
-            btn.append(_html.I(css='fa fa-fw fa-remove'))
+            btn.append(_html.I(css='fa fas fa-fw fa-remove fa-times'))
             self._widget.toolbar.append(btn)
             self._widget.toolbar.append(_html.Span('&nbsp;'))
 
@@ -288,7 +293,7 @@ class Browser:
             ep = btn_data.get('ep')
             url = _router.rule_url(ep) if ep else '#'
             css = 'btn btn-{} mass-action-button'.format(btn_data.get('color', 'default btn-light'))
-            icon = 'fa fa-fw fa-' + btn_data.get('icon', 'question')
+            icon = 'fa fas fa-fw fa-' + btn_data.get('icon', 'question')
             button = _html.A(href=url, css=css, title=btn_data.get('title'))
             if icon:
                 button.append(_html.I(css=icon))
