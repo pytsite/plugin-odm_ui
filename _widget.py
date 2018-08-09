@@ -238,7 +238,7 @@ class EntityCheckboxes(_widget.select.Checkboxes):
         # Do additional sorting of string fields, because MongoDB does not sort properly all languages
         if self._sort_field and isinstance(_odm.dispense(self._model).get_field(self._sort_field), _odm.field.String):
             rev = True if self._sort_order == _odm.I_DESC else False
-            entities = sorted(entities, key=lambda e: _pyuca_col.sort_key(e.f_get(self._sort_field)), reverse=rev)
+            entities = sorted(entities, key=lambda ent: _pyuca_col.sort_key(ent.f_get(self._sort_field)), reverse=rev)
 
         for e in entities:
             caption = self._caption_field(e) if callable(self._caption_field) else e.get_field(self._caption_field)

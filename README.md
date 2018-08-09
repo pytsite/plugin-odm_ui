@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 3.18 (2018-08-10)
+
+Meta titles is now set by forms setup code.
+
+
 ### 3.17 (2018-08-09)
 
 Support for `Browser`'s constructor arguments to specify router's rules
