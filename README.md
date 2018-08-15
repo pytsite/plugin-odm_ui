@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 3.18.1 (2018-08-15)
+
+Processing arguments in `Browser` fixed.
+
+
 ### 3.18 (2018-08-10)
 
 Meta titles is now set by forms setup code.
