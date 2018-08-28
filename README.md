@@ -4,6 +4,13 @@
 ## Changelog
 
 
+### 3.19 (2018-08-28)
+
+- Support of `widget-2.13` in `widget.EntitySelectSearch` added.
+- Property `UIEntity.odm_ui_widget_select_search_entities_title` is a
+method now.
+
+
 ### 3.18.1 (2018-08-15)
 
 Processing arguments in `Browser` fixed.

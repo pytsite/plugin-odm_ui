@@ -278,8 +278,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
         """
         raise NotImplementedError('Not implemented yet')
 
-    @property
-    def odm_ui_widget_select_search_entities_title(self):
+    def odm_ui_widget_select_search_entities_title(self, args: dict):
         raise NotImplementedError('Not implemented yet')
 
     @property

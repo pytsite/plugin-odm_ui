@@ -1,6 +1,6 @@
 {
   "name": "odm_ui",
-  "version": "3.18.1",
+  "version": "3.19",
   "description": {
     "en": "Object Document Mapper UI",
     "ru": "Object Document Mapper UI",
@@ -26,7 +26,7 @@
       "http_api",
       "odm>=3.2",
       "odm_auth>=1.9",
-      "widget>=2.4"
+      "widget>=2.13"
     ]
   }
 }

@@ -259,9 +259,11 @@ class EntitySelectSearch(_widget.select.Select2):
         if not model:
             raise ValueError('Model is not specified')
 
-        kwargs['ajax_url'] = _http_api.url('odm_ui@widget_entity_select_search', {'model': model})
+        kwargs.setdefault('ajax_url', _http_api.url('odm_ui@widget_entity_select_search', {'model': model}))
 
         super().__init__(uid, **kwargs)
+
+        self._data['model'] = model
 
     def set_val(self, value):
         if value in (None, ''):
@@ -289,7 +291,7 @@ class EntitySelectSearch(_widget.select.Select2):
         if self._ajax_url and self._value:
             entity = _odm.get_by_ref(self._value)
             if hasattr(entity, 'odm_ui_widget_select_search_entities_title'):
-                self._items.append((self._value, entity.odm_ui_widget_select_search_entities_title))
+                self._items.append((self._value, entity.odm_ui_widget_select_search_entities_title({})))
             else:
                 raise ValueError("Entity '{}' does not support this operation".format(type(entity)))
 
