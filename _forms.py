@@ -18,6 +18,9 @@ class Modify(_form.Form):
         if not model:
             raise ValueError('Model is not specified')
 
+        if not self.name:
+            self.name = 'odm_ui_modify_' + model
+
         try:
             from ._api import dispense_entity
             entity = dispense_entity(model, self.attr('eid'))
@@ -190,6 +193,9 @@ class Delete(MassAction):
         super()._on_setup_form()
 
         model = self.attr('model')
+
+        if not self.name:
+            self.name = 'odm_ui_delete_' + model
 
         # Check permissions
         for eid in self.attr('eids', self.attr('ids', [])):

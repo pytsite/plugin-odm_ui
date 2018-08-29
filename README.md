@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 3.19.1 (2018-08-29)
+
+Forms names fixed.
+
+
 ### 3.19 (2018-08-28)
 
 - Support of `widget-2.13` in `widget.EntitySelectSearch` added.
