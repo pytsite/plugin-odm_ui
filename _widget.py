@@ -260,10 +260,9 @@ class EntitySelectSearch(_widget.select.Select2):
             raise ValueError('Model is not specified')
 
         kwargs.setdefault('ajax_url', _http_api.url('odm_ui@widget_entity_select_search', {'model': model}))
+        kwargs.setdefault('linked_select_ajax_query_attr', model)
 
         super().__init__(uid, **kwargs)
-
-        self._data['model'] = model
 
     def set_val(self, value):
         if value in (None, ''):
