@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 3.21 (2018-09-02)
+
+New public property `widget.EntitySelectSearch.model`.
+
+
 ### 3.20 (2018-09-01)
 
 Support of `widget-2.15`.

@@ -255,34 +255,28 @@ class EntitySelectSearch(_widget.select.Select2):
     """
 
     def __init__(self, uid: str, **kwargs):
-        model = kwargs.get('model')
-        if not model:
+        self._model = kwargs.get('model')
+        if not self._model:
             raise ValueError('Model is not specified')
 
-        kwargs.setdefault('ajax_url', _http_api.url('odm_ui@widget_entity_select_search', {'model': model}))
-        kwargs.setdefault('linked_select_ajax_query_attr', model)
+        kwargs.setdefault('ajax_url', _http_api.url('odm_ui@widget_entity_select_search', {'model': self._model}))
+        kwargs.setdefault('linked_select_ajax_query_attr', self._model)
 
         super().__init__(uid, **kwargs)
 
+    @property
+    def model(self) -> str:
+        return self._model
+
+    @model.setter
+    def model(self, value: str):
+        self._model = value
+
     def set_val(self, value):
-        if value in (None, ''):
-            return super().set_val(None)
-
-        e = _odm.get_by_ref(value)
-        if not isinstance(e, _odm.Entity):
-            raise TypeError('Instance of {} expected, got {}'.format(_odm.Entity, type(e)))
-
-        return super().set_val(e.manual_ref)
+        return super().set_val(_odm.get_by_ref(value).manual_ref if value else None)
 
     def get_val(self) -> _Optional[_odm.Entity]:
-        if not self._value:
-            return None
-
-        e = _odm.get_by_ref(self._value)
-        if not isinstance(e, _odm.Entity):
-            raise TypeError('Instance of {} expected, got {}'.format(_odm.Entity, type(e)))
-
-        return e
+        return _odm.get_by_ref(self._value) if self._value else None
 
     def _get_element(self, **kwargs):
         # In AJAX-mode Select2 doesn't contain any items,
