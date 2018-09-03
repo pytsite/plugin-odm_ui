@@ -4,6 +4,12 @@
 ## Changelog
 
 
+### 3.22 (2018-09-03)
+
+New constructor's argument `entity_title_args` added in
+`widget.EntitySelectSearch`.
+
+
 ### 3.21 (2018-09-02)
 
 New public property `widget.EntitySelectSearch.model`.
