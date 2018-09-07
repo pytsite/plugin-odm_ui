@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 3.22.1 (2018-09-07)
+
+Form change watchdog behaviour fixed.
+
+
 ### 3.22 (2018-09-03)
 
 New constructor's argument `entity_title_args` added in
