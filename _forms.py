@@ -103,7 +103,7 @@ class Modify(_form.Form):
             weight=150,
             value=_lang.t('odm_ui@cancel'),
             icon='fa fas fa-fw fa-remove fa-times',
-            href=cancel_href,
+            href=self.referer or self.redirect or _router.base_url(),
             form_area='footer',
         ))
 
@@ -177,7 +177,7 @@ class MassAction(_form.Form):
             uid='action_cancel',
             weight=100,
             value=_lang.t('odm_ui@cancel'),
-            href=self.redirect,
+            href=self.referer or self.redirect or _router.base_url(),
             icon='fa fas fa-ban',
             form_area='footer'
         ))
