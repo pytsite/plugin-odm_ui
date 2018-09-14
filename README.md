@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 3.24 (2018-09-14)
+
+Support of `odm-4.0`.
+
+
 ### 3.23 (2018-09-09)
 
 Support of `form-4.14`.

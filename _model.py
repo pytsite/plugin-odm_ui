@@ -274,7 +274,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
         """Get data for widget.EntitySelectSearch
 
         Each list item in return value must be a dict which contains two keys: 'id' and 'text',
-        where 'id' must contain entity's manual_ref and 'text' -- what should be shown to the user.
+        where 'id' must contain entity's ref and 'text' -- what should be shown to the user.
         """
         raise NotImplementedError('Not implemented yet')
 

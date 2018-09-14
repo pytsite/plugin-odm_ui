@@ -23,7 +23,7 @@ class EntitySelect(_widget.select.Select):
         """
         if 'exclude' in kwargs and kwargs['exclude']:
             if isinstance(kwargs['exclude'], _odm.Entity):
-                kwargs['exclude'] = [kwargs['exclude'].manual_ref] if not kwargs['exclude'].is_new else []
+                kwargs['exclude'] = [kwargs['exclude'].ref] if not kwargs['exclude'].is_new else []
             elif isinstance(kwargs['exclude'], str):
                 kwargs['exclude'] = [kwargs['exclude']]
             elif isinstance(kwargs['exclude'], (list, tuple)):
@@ -31,7 +31,7 @@ class EntitySelect(_widget.select.Select):
                 for item in kwargs['exclude']:
                     if isinstance(item, _odm.Entity):
                         if not item.is_new:
-                            ex.append(item.manual_ref)
+                            ex.append(item.ref)
                     elif isinstance(item, str):
                         ex.append(item)
                     else:
@@ -42,7 +42,7 @@ class EntitySelect(_widget.select.Select):
             if kwargs.get('exclude_descendants', True):
                 for ref in kwargs['exclude'].copy():
                     for descendant in _odm.get_by_ref(ref).descendants:
-                        kwargs['exclude'].append(descendant.manual_ref)
+                        kwargs['exclude'].append(descendant.ref)
 
         super().__init__(uid, **kwargs)
 
@@ -59,8 +59,25 @@ class EntitySelect(_widget.select.Select):
             self._sort_field = self._caption_field
 
         self._sort_order = kwargs.get('sort_order', _odm.I_ASC)  # type: int
-
         self._finder_adjust = kwargs.get('finder_adjust')  # type: _Callable[[_odm.Finder], None]
+        self._ignore_missing_entities = kwargs.get('ignore_missing_entities', False)
+        self._ignore_invalid_refs = kwargs.get('ignore_invalid_refs', False)
+
+    @property
+    def ignore_missing_entities(self) -> bool:
+        return self._ignore_missing_entities
+
+    @ignore_missing_entities.setter
+    def ignore_missing_entities(self, value: bool):
+        self._ignore_missing_entities = value
+
+    @property
+    def ignore_invalid_refs(self) -> bool:
+        return self._ignore_invalid_refs
+
+    @ignore_invalid_refs.setter
+    def ignore_invalid_refs(self, value: bool):
+        self._ignore_invalid_refs = value
 
     @property
     def sort_field(self) -> str:
@@ -84,10 +101,16 @@ class EntitySelect(_widget.select.Select):
         if value == '':
             value = None
         elif isinstance(value, _odm.model.Entity):
-            value = value.model + ':' + str(value.id)
+            value = value.ref
         elif isinstance(value, _DBRef):
-            value = _odm.get_by_ref(value)
-            value = value.model + ':' + str(value.id)
+            try:
+                value = _odm.get_by_ref(value).ref
+            except _odm.error.InvalidReference as e:
+                if not self._ignore_invalid_refs:
+                    raise e
+            except _odm.error.EntityNotFound as e:
+                if not self._ignore_missing_entities:
+                    raise e
 
         return super().set_val(value)
 
@@ -119,7 +142,7 @@ class EntitySelect(_widget.select.Select):
             _result = []
 
         for entity in root_entities:
-            _result.append((entity.manual_ref, self._get_caption(entity)))
+            _result.append((entity.ref, self._get_caption(entity)))
             self._build_items_tree(entity.children, _result)
 
         return _result
@@ -165,14 +188,31 @@ class EntityCheckboxes(_widget.select.Checkboxes):
 
         self._exclude = []  # type: _List[_odm.model.Entity]
         for e in kwargs.get('exclude', ()):
-            self._exclude.append(_odm.get_by_ref(_odm.resolve_ref(e)))
+            self._exclude.append(_odm.get_by_ref(e))
 
         self._sort_order = kwargs.get('sort_order', _odm.I_ASC)  # type: int
-
         self._finder_adjust = kwargs.get('finder_adjust')  # type: _Callable[[_odm.Finder], None]
+        self._ignore_missing_entities = kwargs.get('ignore_missing_entities', False)
+        self._ignore_invalid_refs = kwargs.get('ignore_invalid_refs', False)
 
         # Available items will be set during call to self._get_element()
         self._items = []
+
+    @property
+    def ignore_missing_entities(self) -> bool:
+        return self._ignore_missing_entities
+
+    @ignore_missing_entities.setter
+    def ignore_missing_entities(self, value: bool):
+        self._ignore_missing_entities = value
+
+    @property
+    def ignore_invalid_refs(self) -> bool:
+        return self._ignore_invalid_refs
+
+    @ignore_invalid_refs.setter
+    def ignore_invalid_refs(self, value: bool):
+        self._ignore_invalid_refs = value
 
     @property
     def sort_field(self) -> str:
@@ -212,12 +252,14 @@ class EntityCheckboxes(_widget.select.Checkboxes):
             if not v:
                 continue
 
-            # Check entity for existence
-            entity = _odm.get_by_ref(_odm.resolve_ref(v))
-
-            # Append entity reference as string
-            if entity:
-                clean_val.append(str(entity))
+            try:
+                clean_val.append(_odm.get_by_ref(v).ref)
+            except _odm.error.InvalidReference as e:
+                if not self._ignore_invalid_refs:
+                    raise e
+            except _odm.error.EntityNotFound as e:
+                if not self._ignore_missing_entities:
+                    raise e
 
         return super().set_val(clean_val)
 
@@ -263,6 +305,8 @@ class EntitySelectSearch(_widget.select.Select2):
         kwargs.setdefault('linked_select_ajax_query_attr', self._model)
 
         self._entity_title_args = kwargs.get('entity_title_args', {})
+        self._ignore_missing_entities = kwargs.get('ignore_missing_entities', False)
+        self._ignore_invalid_refs = kwargs.get('ignore_invalid_refs', False)
 
         super().__init__(uid, **kwargs)
 
@@ -274,8 +318,24 @@ class EntitySelectSearch(_widget.select.Select2):
     def model(self, value: str):
         self._model = value
 
+    @property
+    def ignore_missing_entities(self) -> bool:
+        return self._ignore_missing_entities
+
+    @ignore_missing_entities.setter
+    def ignore_missing_entities(self, value: bool):
+        self._ignore_missing_entities = value
+
+    @property
+    def ignore_invalid_refs(self) -> bool:
+        return self._ignore_invalid_refs
+
+    @ignore_invalid_refs.setter
+    def ignore_invalid_refs(self, value: bool):
+        self._ignore_invalid_refs = value
+
     def set_val(self, value):
-        return super().set_val(_odm.get_by_ref(value).manual_ref if value else None)
+        return super().set_val(_odm.get_by_ref(value).ref if value else None)
 
     def get_val(self) -> _Optional[_odm.Entity]:
         return _odm.get_by_ref(self._value) if self._value else None
@@ -286,13 +346,20 @@ class EntitySelectSearch(_widget.select.Select2):
         # In AJAX-mode Select2 doesn't contain any items,
         # but if we have selected item, it is necessary to append it
         if self._ajax_url and self._value:
-            entity = _odm.get_by_ref(self._value)
-            if hasattr(entity, 'odm_ui_widget_select_search_entities_title'):
-                self._items.append([
-                    self._value,
-                    entity.odm_ui_widget_select_search_entities_title(self._entity_title_args),
-                ])
-            else:
-                raise ValueError("Entity '{}' does not support this operation".format(type(entity)))
+            try:
+                entity = _odm.get_by_ref(self._value)
+                if hasattr(entity, 'odm_ui_widget_select_search_entities_title'):
+                    self._items.append([
+                        self._value,
+                        entity.odm_ui_widget_select_search_entities_title(self._entity_title_args),
+                    ])
+                else:
+                    raise ValueError("Entity '{}' does not support this operation".format(type(entity)))
+            except _odm.error.InvalidReference as e:
+                if not self._ignore_invalid_refs:
+                    raise e
+            except _odm.error.EntityNotFound as e:
+                if not self.ignore_missing_entities:
+                    raise e
 
         return super()._get_element()
