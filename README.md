@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 3.24.1 (2018-09-14)
+
+Processing values in widgets fixed.
+
+
 ### 3.24 (2018-09-14)
 
 Support of `odm-4.0`.

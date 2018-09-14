@@ -4,9 +4,7 @@ __author__ = 'Oleksandr Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
-from typing import List as _List, Tuple as _Tuple, Callable as _Callable, Iterable as _Iterable, Union as _Union, \
-    Optional as _Optional
-from bson.dbref import DBRef as _DBRef
+from typing import List as _List, Tuple as _Tuple, Callable as _Callable, Iterable as _Iterable, Union as _Union
 from pyuca import Collator as _Collator
 from pytsite import lang as _lang
 from plugins import widget as _widget, odm as _odm, http_api as _http_api
@@ -44,8 +42,6 @@ class EntitySelect(_widget.select.Select):
                     for descendant in _odm.get_by_ref(ref).descendants:
                         kwargs['exclude'].append(descendant.ref)
 
-        super().__init__(uid, **kwargs)
-
         self._model = kwargs.get('model')
         if not self._model:
             raise ValueError('Model is not specified')
@@ -62,6 +58,8 @@ class EntitySelect(_widget.select.Select):
         self._finder_adjust = kwargs.get('finder_adjust')  # type: _Callable[[_odm.Finder], None]
         self._ignore_missing_entities = kwargs.get('ignore_missing_entities', False)
         self._ignore_invalid_refs = kwargs.get('ignore_invalid_refs', False)
+
+        super().__init__(uid, **kwargs)
 
     @property
     def ignore_missing_entities(self) -> bool:
@@ -98,21 +96,16 @@ class EntitySelect(_widget.select.Select):
     def set_val(self, value):
         """Set value of the widget.
         """
-        if value == '':
-            value = None
-        elif isinstance(value, _odm.model.Entity):
-            value = value.ref
-        elif isinstance(value, _DBRef):
-            try:
-                value = _odm.get_by_ref(value).ref
-            except _odm.error.InvalidReference as e:
-                if not self._ignore_invalid_refs:
-                    raise e
-            except _odm.error.EntityNotFound as e:
-                if not self._ignore_missing_entities:
-                    raise e
+        try:
+            super().set_val(_odm.get_by_ref(value).ref if value else None)
+        except _odm.error.InvalidReference as e:
+            if not self._ignore_invalid_refs:
+                raise e
+        except _odm.error.EntityNotFound as e:
+            if not self._ignore_missing_entities:
+                raise e
 
-        return super().set_val(value)
+        return self
 
     def _get_finder(self) -> _odm.Finder:
         finder = _odm.find(self._model)
@@ -170,8 +163,6 @@ class EntityCheckboxes(_widget.select.Checkboxes):
     def __init__(self, uid: str, **kwargs):
         """Init.
         """
-        super().__init__(uid, **kwargs)
-
         self._model = kwargs.get('model')
         if not self._model:
             raise ValueError('Model is not specified')
@@ -194,6 +185,8 @@ class EntityCheckboxes(_widget.select.Checkboxes):
         self._finder_adjust = kwargs.get('finder_adjust')  # type: _Callable[[_odm.Finder], None]
         self._ignore_missing_entities = kwargs.get('ignore_missing_entities', False)
         self._ignore_invalid_refs = kwargs.get('ignore_invalid_refs', False)
+
+        super().__init__(uid, **kwargs)
 
         # Available items will be set during call to self._get_element()
         self._items = []
@@ -335,10 +328,16 @@ class EntitySelectSearch(_widget.select.Select2):
         self._ignore_invalid_refs = value
 
     def set_val(self, value):
-        return super().set_val(_odm.get_by_ref(value).ref if value else None)
+        try:
+            super().set_val(_odm.get_by_ref(value).ref if value else None)
+        except _odm.error.InvalidReference as e:
+            if not self._ignore_invalid_refs:
+                raise e
+        except _odm.error.EntityNotFound as e:
+            if not self._ignore_missing_entities:
+                raise e
 
-    def get_val(self) -> _Optional[_odm.Entity]:
-        return _odm.get_by_ref(self._value) if self._value else None
+        return self
 
     def _get_element(self, **kwargs):
         self._ajax_url_query.update(self._entity_title_args)
