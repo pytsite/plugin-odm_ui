@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 3.24.2 (2018-09-21)
+
+Processing empty results in entities browser fixed.
+
+
 ### 3.24.1 (2018-09-14)
 
 Processing values in widgets fixed.
