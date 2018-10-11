@@ -54,9 +54,6 @@ class Modify(_form.Form):
         if not self.redirect:
             self.redirect = 'ENTITY_VIEW'
 
-        # Assets
-        self.assets.append('odm_ui@js/form.js')
-
         # CSS
         self.css += ' odm-ui-form odm-ui-m-form odm-ui-form-' + model
 

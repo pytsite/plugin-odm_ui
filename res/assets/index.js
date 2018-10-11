@@ -1,3 +1,6 @@
+import './browser.scss';
+const $ = require('jquery');
+
 $('.odm-ui-m-form').on('forward:form:pytsite', function () {
     setTimeout(() => {
         const form = $(this);

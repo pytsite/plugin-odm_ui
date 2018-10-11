@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 4.0 (2018-10-11)
+
+Support of `pytsite-8.x`, `assetman-3.x`, `widget-3.x`.
+
+
 ### 3.24.2 (2018-09-21)
 
 Processing empty results in entities browser fixed.

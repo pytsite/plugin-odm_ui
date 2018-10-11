@@ -11,28 +11,10 @@ from ._browser import Browser
 from ._model import UIEntity
 
 
-def plugin_load():
-    from plugins import assetman
-
-    assetman.register_package(__name__)
-    assetman.t_less(__name__)
-    assetman.t_js(__name__)
-
-
-def plugin_install():
-    from plugins import assetman
-
-    assetman.build(__name__)
-
-
 def plugin_load_wsgi():
-    from pytsite import tpl, lang, router
+    from pytsite import router
     from plugins import admin, http_api, auth_ui
     from . import _controllers, _http_api_controllers
-
-    # Resources
-    lang.register_package(__name__)
-    tpl.register_package(__name__)
 
     abp = admin.base_path()
 

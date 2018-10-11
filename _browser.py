@@ -6,8 +6,7 @@ __license__ = 'MIT'
 
 from typing import Callable as _Callable, Union as _Union
 from pytsite import router as _router, metatag as _metatag, lang as _lang, html as _html, events as _events
-from plugins import widget as _widget, auth as _auth, odm as _odm, permissions as _permissions, http_api as _http_api, \
-    assetman as _assetman
+from plugins import widget as _widget, auth as _auth, odm as _odm, permissions as _permissions, http_api as _http_api
 from . import _api, _model
 
 
@@ -64,8 +63,6 @@ class Browser:
         if self._model_class.odm_ui_entity_actions_enabled() and \
                 (self._model_class.odm_ui_modification_allowed() or self._model_class.odm_ui_deletion_allowed()):
             self.insert_data_field('_actions', 'odm_ui@actions', False)
-
-        _assetman.preload('odm_ui@css/odm-ui-browser.css')
 
         # Metatags
         _metatag.t_set('title', self._model_class.t('odm_ui_browser_title_' + self._model))

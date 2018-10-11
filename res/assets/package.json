@@ -1,0 +1,7 @@
+{
+  "name": "@pytsite/odm-ui",
+  "main": "index.js",
+  "dependencies": {
+    "jquery": "3.x"
+  }
+}
