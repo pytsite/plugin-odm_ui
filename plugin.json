@@ -1,6 +1,6 @@
 {
   "name": "odm_ui",
-  "version": "4.1",
+  "version": "4.2",
   "description": {
     "en": "Object Document Mapper UI",
     "ru": "Object Document Mapper UI",
@@ -19,14 +19,14 @@
     },
     "plugins": {
       "admin": "2.x",
-      "assetman": "4.x",
+      "assetman": "5.x",
       "auth": "3.x",
       "auth_ui": "4.x",
       "form": "5.x",
       "http_api": "3.x",
       "odm": "5.x",
       "odm_auth": "2.x",
-      "widget": "3.x"
+      "widget": "4.x"
     }
   }
 }
