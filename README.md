@@ -4,6 +4,12 @@
 ## Changelog
 
 
+### 4.3 (2018-11-08)
+
+New arguments support added in `widget.EntitySelectSearch`:
+`search_limit`, `search_sort_by`, `search_order`.
+
+
 ### 4.2 (2018-10-22)
 
 Support of `assetman-5.x` and `widget-4.x`.

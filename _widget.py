@@ -303,6 +303,12 @@ class EntitySelectSearch(_widget.select.Select2):
 
         super().__init__(uid, **kwargs)
 
+        self._ajax_url_query.update({
+            'limit': kwargs.get('search_limit', 10),
+            'sort_by': kwargs.get('search_sort_by'),
+            'sort_order': kwargs.get('search_order', _odm.I_ASC),
+        })
+
     @property
     def model(self) -> str:
         return self._model
