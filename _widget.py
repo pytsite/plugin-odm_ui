@@ -335,7 +335,11 @@ class EntitySelectSearch(_widget.select.Select2):
 
     def set_val(self, value):
         try:
-            super().set_val(_odm.get_by_ref(value).ref if value else None)
+            if self._multiple:
+                value = [_odm.get_by_ref(v).ref for v in value if v]
+            else:
+                value = _odm.get_by_ref(value).ref if value else None
+            super().set_val(value)
         except _odm.error.InvalidReference as e:
             if not self._ignore_invalid_refs:
                 raise e
@@ -352,14 +356,19 @@ class EntitySelectSearch(_widget.select.Select2):
         # but if we have selected item, it is necessary to append it
         if self._ajax_url and self._value:
             try:
-                entity = _odm.get_by_ref(self._value)
-                if hasattr(entity, 'odm_ui_widget_select_search_entities_title'):
+                if self._multiple:
+                    for ref in self._value:
+                        entity = _odm.get_by_ref(ref)
+                        self._items.append([
+                            entity.ref,
+                            entity.odm_ui_widget_select_search_entities_title(self._entity_title_args),
+                        ])
+                else:
+                    entity = _odm.get_by_ref(self._value)
                     self._items.append([
                         self._value,
                         entity.odm_ui_widget_select_search_entities_title(self._entity_title_args),
                     ])
-                else:
-                    raise ValueError("Entity '{}' does not support this operation".format(type(entity)))
             except _odm.error.InvalidReference as e:
                 if not self._ignore_invalid_refs:
                     raise e

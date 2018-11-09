@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 4.3.1 (2018-11-09)
+
+Processing list values in `widget.EntitySelectSearch` fixed.
+
+
 ### 4.3 (2018-11-08)
 
 New arguments support added in `widget.EntitySelectSearch`:
