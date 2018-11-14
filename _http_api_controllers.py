@@ -75,7 +75,7 @@ class GetWidgetEntitySelectSearch(_routing.Controller):
 
         exclude = args.get('exclude')
         if exclude:
-            f.ninc('ref', exclude)
+            f.ninc('_ref', exclude)
 
         sort_by = args.get('sort_by')
         if sort_by and f.mock.has_field(sort_by):
