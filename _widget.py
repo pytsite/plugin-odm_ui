@@ -4,62 +4,61 @@ __author__ = 'Oleksandr Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
-from typing import List as _List, Tuple as _Tuple, Callable as _Callable, Iterable as _Iterable, Union as _Union
+from typing import List as _List, Callable as _Callable, Union as _Union
 from pyuca import Collator as _Collator
+from json import dumps as _json_dumps
 from pytsite import lang as _lang
 from plugins import widget as _widget, odm as _odm, http_api as _http_api
 
 _pyuca_col = _Collator()
 
 
-class EntitySelect(_widget.select.Select):
-    """Select Entity with Select Widget.
+def _sanitize_kwargs_exclude(kwargs: dict):
+    if not ('exclude' in kwargs and kwargs['exclude']):
+        return
+
+    if isinstance(kwargs['exclude'], _odm.Entity):
+        kwargs['exclude'] = [kwargs['exclude'].ref] if not kwargs['exclude'].is_new else []
+    elif isinstance(kwargs['exclude'], str):
+        kwargs['exclude'] = [kwargs['exclude']]
+    elif isinstance(kwargs['exclude'], (list, tuple)):
+        ex = []
+        for item in kwargs['exclude']:
+            if isinstance(item, _odm.Entity):
+                if not item.is_new:
+                    ex.append(item.ref)
+            elif isinstance(item, str):
+                ex.append(item)
+            else:
+                raise TypeError('Unsupported type: {}'.format(type(item)))
+
+        kwargs['exclude'] = ex
+
+    if kwargs.get('exclude_descendants', True):
+        for ref in kwargs['exclude'].copy():
+            for descendant in _odm.get_by_ref(ref).descendants:
+                kwargs['exclude'].append(descendant.ref)
+
+
+class EntitySelect(_widget.select.Select2):
+    """Entity Select
     """
 
-    def __init__(self, uid: str, **kwargs):
-        """Init
-        """
-        if 'exclude' in kwargs and kwargs['exclude']:
-            if isinstance(kwargs['exclude'], _odm.Entity):
-                kwargs['exclude'] = [kwargs['exclude'].ref] if not kwargs['exclude'].is_new else []
-            elif isinstance(kwargs['exclude'], str):
-                kwargs['exclude'] = [kwargs['exclude']]
-            elif isinstance(kwargs['exclude'], (list, tuple)):
-                ex = []
-                for item in kwargs['exclude']:
-                    if isinstance(item, _odm.Entity):
-                        if not item.is_new:
-                            ex.append(item.ref)
-                    elif isinstance(item, str):
-                        ex.append(item)
-                    else:
-                        raise TypeError('Unsupported type: {}'.format(type(item)))
+    @property
+    def model(self) -> str:
+        return self._model
 
-                kwargs['exclude'] = ex
+    @model.setter
+    def model(self, value: str):
+        self._model = value
 
-            if kwargs.get('exclude_descendants', True):
-                for ref in kwargs['exclude'].copy():
-                    for descendant in _odm.get_by_ref(ref).descendants:
-                        kwargs['exclude'].append(descendant.ref)
+    @property
+    def entity_title_args(self) -> bool:
+        return self._entity_title_args
 
-        self._model = kwargs.get('model')
-        if not self._model:
-            raise ValueError('Model is not specified')
-
-        self._caption_field = kwargs.get('caption_field')  # type: _Union[str, _Callable[[_odm.Entity], None]]
-        if not self._caption_field:
-            raise ValueError('Caption field is not specified')
-
-        self._sort_field = kwargs.get('sort_field')  # type: str
-        if not self._sort_field and isinstance(self._caption_field, str):
-            self._sort_field = self._caption_field
-
-        self._sort_order = kwargs.get('sort_order', _odm.I_ASC)  # type: int
-        self._finder_adjust = kwargs.get('finder_adjust')  # type: _Callable[[_odm.Finder], None]
-        self._ignore_missing_entities = kwargs.get('ignore_missing_entities', False)
-        self._ignore_invalid_refs = kwargs.get('ignore_invalid_refs', False)
-
-        super().__init__(uid, **kwargs)
+    @entity_title_args.setter
+    def entity_title_args(self, value: bool):
+        self._entity_title_args = value
 
     @property
     def ignore_missing_entities(self) -> bool:
@@ -78,12 +77,12 @@ class EntitySelect(_widget.select.Select):
         self._ignore_invalid_refs = value
 
     @property
-    def sort_field(self) -> str:
-        return self._sort_field
+    def sort_by(self) -> str:
+        return self._sort_by
 
-    @sort_field.setter
-    def sort_field(self, value: str):
-        self._sort_field = value
+    @sort_by.setter
+    def sort_by(self, value: str):
+        self._sort_by = value
 
     @property
     def sort_order(self) -> int:
@@ -93,11 +92,39 @@ class EntitySelect(_widget.select.Select):
     def sort_order(self, value: int):
         self._sort_order = value
 
+    def __init__(self, uid: str, **kwargs):
+        self._model = kwargs.get('model')
+        if not self._model:
+            raise ValueError('Model is not specified')
+
+        _sanitize_kwargs_exclude(kwargs)
+
+        kwargs.setdefault('ajax_url', _http_api.url('odm_ui@widget_entity_select_search', {'model': self._model}))
+        kwargs.setdefault('linked_select_ajax_query_attr', self._model)
+
+        self._limit = kwargs.get('limit', 10)
+        self._sort_by = kwargs.get('sort_by')
+        self._sort_order = kwargs.get('sort_order', _odm.I_ASC)
+        self._entity_title_args = kwargs.get('entity_title_args', {})
+        self._ignore_missing_entities = kwargs.get('ignore_missing_entities', False)
+        self._ignore_invalid_refs = kwargs.get('ignore_invalid_refs', False)
+
+        super().__init__(uid, **kwargs)
+
+        self._ajax_url_query.update({
+            'limit': self._limit,
+            'sort_by': self._sort_by,
+            'sort_order': self._sort_order,
+            'entity_title_args': _json_dumps(self._entity_title_args),
+        })
+
     def set_val(self, value):
-        """Set value of the widget.
-        """
         try:
-            super().set_val(_odm.get_by_ref(value).ref if value else None)
+            if self._multiple:
+                value = [_odm.get_by_ref(v).ref for v in value if v]
+            else:
+                value = _odm.get_by_ref(value).ref if value else None
+            super().set_val(value)
         except _odm.error.InvalidReference as e:
             if not self._ignore_invalid_refs:
                 raise e
@@ -107,51 +134,24 @@ class EntitySelect(_widget.select.Select):
 
         return self
 
-    def _get_finder(self) -> _odm.Finder:
-        finder = _odm.find(self._model)
-        if self._sort_field:
-            finder.sort([(self._sort_field, self._sort_order)])
-
-        if self._finder_adjust:
-            self._finder_adjust(finder)
-
-        return finder
-
-    def _get_caption(self, entity: _odm.model.Entity) -> str:
-        if isinstance(self._caption_field, str):
-            caption = str(entity.f_get(self._caption_field))
-        elif callable(self._caption_field):
-            caption = self._caption_field(entity)
-        else:
-            raise TypeError('Caption field must be a string or a callable, got {}'.format(type(self._caption_field)))
-
-        if entity.depth:
-            caption = '-' * entity.depth + ' ' + caption
-
-        return caption
-
-    def _build_items_tree(self, root_entities: _Iterable[_odm.Entity], _result: list = None) -> _List[_Tuple[str, str]]:
-        if _result is None:
-            _result = []
-
-        for entity in root_entities:
-            _result.append((entity.ref, self._get_caption(entity)))
-            self._build_items_tree(entity.children, _result)
-
-        return _result
-
     def _get_element(self, **kwargs):
-        """Render the widget
-        """
-        root_items = [entity for entity in self._get_finder().eq('_parent', None)]
+        self._ajax_url_query.update(self._entity_title_args)
 
-        # Do additional sorting of string fields, because MongoDB does not sort properly all languages
-        if self._sort_field and isinstance(_odm.dispense(self._model).get_field(self._sort_field), _odm.field.String):
-            root_items = sorted(root_items, key=lambda e: _pyuca_col.sort_key(e.f_get(self._sort_field)),
-                                reverse=True if self._sort_order == _odm.I_DESC else False)
-
-        for item in self._build_items_tree(root_items):
-            self._items.append((item[0], item[1]))
+        # In AJAX-mode Select2 doesn't contain any items, but here is a selected item, it is necessary to append it
+        if self._ajax_url and self._value:
+            try:
+                for ref in self._value if self._multiple else [self._value]:
+                    entity = _odm.get_by_ref(ref)
+                    title = entity.odm_ui_widget_select_search_entities_title(self._entity_title_args)
+                    if entity.depth:
+                        title = '-' * entity.depth + ' ' + title
+                    self._items.append([entity.ref, title])
+            except _odm.error.InvalidReference as e:
+                if not self._ignore_invalid_refs:
+                    raise e
+            except _odm.error.EntityNotFound as e:
+                if not self.ignore_missing_entities:
+                    raise e
 
         return super()._get_element()
 
@@ -281,99 +281,5 @@ class EntityCheckboxes(_widget.select.Checkboxes):
                 caption = _lang.t(caption)
 
             self._items.append((str(e), str(caption)))
-
-        return super()._get_element()
-
-
-class EntitySelectSearch(_widget.select.Select2):
-    """Entity Select
-    """
-
-    def __init__(self, uid: str, **kwargs):
-        self._model = kwargs.get('model')
-        if not self._model:
-            raise ValueError('Model is not specified')
-
-        kwargs.setdefault('ajax_url', _http_api.url('odm_ui@widget_entity_select_search', {'model': self._model}))
-        kwargs.setdefault('linked_select_ajax_query_attr', self._model)
-
-        self._entity_title_args = kwargs.get('entity_title_args', {})
-        self._ignore_missing_entities = kwargs.get('ignore_missing_entities', False)
-        self._ignore_invalid_refs = kwargs.get('ignore_invalid_refs', False)
-
-        super().__init__(uid, **kwargs)
-
-        self._ajax_url_query.update({
-            'limit': kwargs.get('search_limit', 10),
-            'sort_by': kwargs.get('search_sort_by'),
-            'sort_order': kwargs.get('search_order', _odm.I_ASC),
-        })
-
-    @property
-    def model(self) -> str:
-        return self._model
-
-    @model.setter
-    def model(self, value: str):
-        self._model = value
-
-    @property
-    def ignore_missing_entities(self) -> bool:
-        return self._ignore_missing_entities
-
-    @ignore_missing_entities.setter
-    def ignore_missing_entities(self, value: bool):
-        self._ignore_missing_entities = value
-
-    @property
-    def ignore_invalid_refs(self) -> bool:
-        return self._ignore_invalid_refs
-
-    @ignore_invalid_refs.setter
-    def ignore_invalid_refs(self, value: bool):
-        self._ignore_invalid_refs = value
-
-    def set_val(self, value):
-        try:
-            if self._multiple:
-                value = [_odm.get_by_ref(v).ref for v in value if v]
-            else:
-                value = _odm.get_by_ref(value).ref if value else None
-            super().set_val(value)
-        except _odm.error.InvalidReference as e:
-            if not self._ignore_invalid_refs:
-                raise e
-        except _odm.error.EntityNotFound as e:
-            if not self._ignore_missing_entities:
-                raise e
-
-        return self
-
-    def _get_element(self, **kwargs):
-        self._ajax_url_query.update(self._entity_title_args)
-
-        # In AJAX-mode Select2 doesn't contain any items,
-        # but if we have selected item, it is necessary to append it
-        if self._ajax_url and self._value:
-            try:
-                if self._multiple:
-                    for ref in self._value:
-                        entity = _odm.get_by_ref(ref)
-                        self._items.append([
-                            entity.ref,
-                            entity.odm_ui_widget_select_search_entities_title(self._entity_title_args),
-                        ])
-                else:
-                    entity = _odm.get_by_ref(self._value)
-                    self._items.append([
-                        self._value,
-                        entity.odm_ui_widget_select_search_entities_title(self._entity_title_args),
-                    ])
-            except _odm.error.InvalidReference as e:
-                if not self._ignore_invalid_refs:
-                    raise e
-            except _odm.error.EntityNotFound as e:
-                if not self.ignore_missing_entities:
-                    raise e
 
         return super()._get_element()

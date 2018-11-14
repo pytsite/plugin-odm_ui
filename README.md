@@ -4,6 +4,12 @@
 ## Changelog
 
 
+### 5.0 (2018-11-14)
+
+- `widget.EntitySelect` completely redesigned.
+- `widget.EntitySelectSearch` removed.
+
+
 ### 4.3.1 (2018-11-09)
 
 Processing list values in `widget.EntitySelectSearch` fixed.
