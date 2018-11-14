@@ -4,6 +4,12 @@
 ## Changelog
 
 
+### 5.0.1 (2018-11-14)
+
+`exclude` argument support fixed in `GetWidgetEntitySelectSearch`
+HTTP API controller.
+
+
 ### 5.0 (2018-11-14)
 
 - `widget.EntitySelect` completely redesigned.

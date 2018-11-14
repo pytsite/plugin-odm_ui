@@ -60,6 +60,7 @@ class GetWidgetEntitySelectSearch(_routing.Controller):
         self.args.add_formatter('sort_by', _formatters.Str(max_len=32))
         self.args.add_formatter('limit', _formatters.PositiveInt(10, 100))
         self.args.add_formatter('entity_title_args', _formatters.JSONObjectToDict())
+        self.args.add_formatter('exclude', _formatters.JSONArrayToList())
 
         self.args.add_formatter('sort_order', _formatters.Str(lower=True))
         self.args.add_formatter('sort_order', _formatters.Transform(1, {'asc': 1, 'desc': -1}))
@@ -71,8 +72,12 @@ class GetWidgetEntitySelectSearch(_routing.Controller):
         cls = _odm.get_model_class(model)  # type: _model.UIEntity
 
         f = _odm.find(model)
-        sort_by = args.get('sort_by')
 
+        exclude = args.get('exclude')
+        if exclude:
+            f.ninc('ref', exclude)
+
+        sort_by = args.get('sort_by')
         if sort_by and f.mock.has_field(sort_by):
             f.sort([(sort_by, args.get('sort_order', _odm.I_ASC))])
 
