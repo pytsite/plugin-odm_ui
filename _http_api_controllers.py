@@ -52,7 +52,7 @@ class GetBrowseRows(_routing.Controller):
         return r
 
 
-class GetWidgetEntitySelectSearch(_routing.Controller):
+class GetWidgetEntitySelect(_routing.Controller):
     def __init__(self):
         super().__init__()
 
@@ -61,6 +61,7 @@ class GetWidgetEntitySelectSearch(_routing.Controller):
         self.args.add_formatter('limit', _formatters.PositiveInt(10, 100))
         self.args.add_formatter('entity_title_args', _formatters.JSONObjectToDict())
         self.args.add_formatter('exclude', _formatters.JSONArrayToList())
+        self.args.add_formatter('depth_indent', _formatters.Str('-'))
 
         self.args.add_formatter('sort_order', _formatters.Str(lower=True))
         self.args.add_formatter('sort_order', _formatters.Transform(1, {'asc': 1, 'desc': -1}))
@@ -85,21 +86,21 @@ class GetWidgetEntitySelectSearch(_routing.Controller):
 
         return f
 
-    def _build_entities_flat_tree(self, model: str, limit: int, args: dict, _parent: _model.UIEntity = None,
-                                  _result: list = None) -> _Iterable[_model.UIEntity]:
-        if _result is None:
-            _result = []
+    def _build_entities_flat_tree(self, model: str, limit: int, args: dict) -> _Iterable[_model.UIEntity]:
+        r = []
 
-        for entity in self._build_finder(model, args).eq('_parent', _parent).get(limit):
-            _result.append(entity)
+        for entity in self._build_finder(model, args).get(limit):
+            # Insert all parent entities
+            cur_parent = entity.parent
+            while cur_parent and cur_parent not in r:
+                r.insert(len(r) - 1, cur_parent)
+                cur_parent = cur_parent.parent
 
-            if len(_result) >= limit:
-                break
+            # Append entity itself
+            if entity not in r:
+                r.append(entity)
 
-            if entity.children:
-                self._build_entities_flat_tree(model, limit, args, entity, _result)
-
-        return _result
+        return r
 
     def exec(self) -> dict:
         model = self.arg('model')
@@ -125,7 +126,7 @@ class GetWidgetEntitySelectSearch(_routing.Controller):
             # Title
             title = entity.odm_ui_widget_select_search_entities_title(self.args)
             if entity.depth:
-                title = '-' * entity.depth + ' ' + title
+                title = '{} {}'.format(self.arg('depth_indent') * entity.depth, title)
 
             items.append({'id': entity.ref, 'text': title})
 

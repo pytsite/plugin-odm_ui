@@ -99,13 +99,14 @@ class EntitySelect(_widget.select.Select2):
 
         _sanitize_kwargs_exclude(kwargs)
 
-        kwargs.setdefault('ajax_url', _http_api.url('odm_ui@widget_entity_select_search', {'model': self._model}))
+        kwargs.setdefault('ajax_url', _http_api.url('odm_ui@widget_entity_select', {'model': self._model}))
         kwargs.setdefault('linked_select_ajax_query_attr', self._model)
 
         self._limit = kwargs.get('limit', 10)
         self._sort_by = kwargs.get('sort_by')
         self._sort_order = kwargs.get('sort_order', _odm.I_ASC)
         self._entity_title_args = kwargs.get('entity_title_args', {})
+        self._depth_indent = kwargs.get('depth_indent', '-')
         self._ignore_missing_entities = kwargs.get('ignore_missing_entities', False)
         self._ignore_invalid_refs = kwargs.get('ignore_invalid_refs', False)
 
@@ -116,6 +117,7 @@ class EntitySelect(_widget.select.Select2):
             'sort_by': self._sort_by,
             'sort_order': self._sort_order,
             'entity_title_args': _json_dumps(self._entity_title_args),
+            'depth_indent': self._depth_indent,
         })
 
     def set_val(self, value):
@@ -144,7 +146,7 @@ class EntitySelect(_widget.select.Select2):
                     entity = _odm.get_by_ref(ref)
                     title = entity.odm_ui_widget_select_search_entities_title(self._entity_title_args)
                     if entity.depth:
-                        title = '-' * entity.depth + ' ' + title
+                        title = '{} {}'.format(self._depth_indent * entity.depth, title)
                     self._items.append([entity.ref, title])
             except _odm.error.InvalidReference as e:
                 if not self._ignore_invalid_refs:

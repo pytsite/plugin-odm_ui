@@ -31,5 +31,5 @@ def plugin_load_wsgi():
 
     # HTTP API handlers
     http_api.handle('GET', 'odm_ui/browse/rows/<model>', _http_api_controllers.GetBrowseRows, 'odm_ui@browse_rows')
-    http_api.handle('GET', 'odm_ui/widget/entity_select_search/<model>',
-                    _http_api_controllers.GetWidgetEntitySelectSearch, 'odm_ui@widget_entity_select_search')
+    http_api.handle('GET', 'odm_ui/widget/entity_select/<model>',
+                    _http_api_controllers.GetWidgetEntitySelect, 'odm_ui@widget_entity_select')

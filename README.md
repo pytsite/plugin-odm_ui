@@ -4,6 +4,12 @@
 ## Changelog
 
 
+### 5.1 (2018-11-15)
+
+- New argument `depth_indent` in `EntitySelect`.
+- Database querying improved in `GetWidgetEntitySelect` controller.
+
+
 ### 5.0.2 (2018-11-14)
 
 Typo fixed.
