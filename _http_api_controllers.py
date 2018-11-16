@@ -69,28 +69,34 @@ class GetWidgetEntitySelect(_routing.Controller):
         self.args.add_formatter('sort_order', _formatters.Enum(1, (-1, 1)))
 
     @staticmethod
-    def _build_finder(model: str, args: dict) -> _odm.Finder:
-        cls = _odm.get_model_class(model)  # type: _model.UIEntity
-
-        f = _odm.find(model)
+    def _find_entities(args: dict) -> _Iterable[_model.UIEntity]:
+        model = args['model']
+        sort_by = args['sort_by']
+        sort_order = args['sort_order']
+        f = _odm.find(model).sort([(sort_by, sort_order)])
 
         exclude = args.get('exclude')
         if exclude:
             f.ninc('_ref', exclude)
 
-        sort_by = args.get('sort_by')
-        if sort_by and f.mock.has_field(sort_by):
-            f.sort([(sort_by, args.get('sort_order', _odm.I_ASC))])
-
+        # Let model's class adjust finder
+        cls = _odm.get_model_class(model)  # type: _model.UIEntity
         cls.odm_ui_widget_select_search_entities(f, args)
 
-        return f
+        # Collect entities
+        entities = list(f.get(args['limit']))
 
-    def _build_entities_flat_tree(self, model: str, limit: int, args: dict) -> _Iterable[_model.UIEntity]:
+        # Do additional sorting, because MongoDB does not sort all languages properly
+        if entities and sort_by and isinstance(entities[0].get_field(sort_by), _odm.field.String):
+            entities = sorted(entities, key=lambda e: _pyuca_col.sort_key(e.f_get(sort_by)),
+                              reverse=sort_order == _odm.I_DESC)
+
+        return entities
+
+    def _build_entities_flat_tree(self, args: dict) -> _Iterable[_model.UIEntity]:
         r = []
 
-        for entity in self._build_finder(model, args).get(limit):
-            # Append entity itself
+        for entity in self._find_entities(args):
             if entity not in r:
                 r.append(entity)
 
@@ -103,26 +109,12 @@ class GetWidgetEntitySelect(_routing.Controller):
         return r
 
     def exec(self) -> dict:
-        model = self.arg('model')
-        sort_by = self.args.get('sort_by')
-        sort_order = self.args.get('sort_order')
-        limit = self.args.get('limit', 10)
-
-        cls = _odm.get_model_class(model)
+        cls = _odm.get_model_class(self.arg('model'))
         if not issubclass(cls, _model.UIEntity):
             raise self.not_found()
 
-        # Get entities tree
-        entities = self._build_entities_flat_tree(model, limit, self.args)
-
-        # Do additional sorting, because MongoDB does not sort all languages properly
-        if sort_by and isinstance(_odm.dispense(model).get_field(sort_by), _odm.field.String):
-            entities = sorted(entities, key=lambda e: _pyuca_col.sort_key(e.f_get(sort_by)),
-                              reverse=sort_order == _odm.I_DESC)
-
-        # Build final value to return
         items = []
-        for entity in entities:
+        for entity in self._build_entities_flat_tree(self.args):
             # Title
             title = entity.odm_ui_widget_select_search_entities_title(self.args)
             if entity.depth:

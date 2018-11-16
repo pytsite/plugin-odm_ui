@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 5.1.2 (2018-11-16)
+
+Sorting error fixed in `GetWidgetEntitySelect` controller.
+
+
 ### 5.1.1 (2018-11-16)
 
 Database querying fixed in `GetWidgetEntitySelect` controller.
