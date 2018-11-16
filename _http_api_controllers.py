@@ -90,15 +90,15 @@ class GetWidgetEntitySelect(_routing.Controller):
         r = []
 
         for entity in self._build_finder(model, args).get(limit):
-            # Insert all parent entities
-            cur_parent = entity.parent
-            while cur_parent and cur_parent not in r:
-                r.insert(len(r) - 1, cur_parent)
-                cur_parent = cur_parent.parent
-
             # Append entity itself
             if entity not in r:
                 r.append(entity)
+
+            # Insert entity's parents
+            cur_entity = entity
+            while cur_entity.parent and cur_entity.parent not in r:
+                r.insert(r.index(cur_entity), cur_entity.parent)
+                cur_entity = cur_entity.parent
 
         return r
 
