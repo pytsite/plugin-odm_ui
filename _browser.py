@@ -74,6 +74,24 @@ class Browser:
         return self._model
 
     @property
+    def browse_rule(self) -> str:
+        """Get browser browse rule name
+        """
+        return self._browse_rule
+
+    @property
+    def m_form_rule(self) -> str:
+        """Get m_form rule name
+        """
+        return self._m_form_rule
+
+    @property
+    def d_form_rule(self) -> str:
+        """Get d_form rule name
+        """
+        return self._d_form_rule
+
+    @property
     def mock(self) -> _model.UIEntity:
         """Get entity mock
         """
@@ -189,7 +207,6 @@ class Browser:
                 '__id': str(entity.id),
                 '__parent': str(entity.parent.id) if entity.parent else None,
             }
-
             if isinstance(row, (list, tuple)):
                 expected_row_length = len(self.data_fields)
                 if self._model_class.odm_ui_entity_actions_enabled():
@@ -210,17 +227,21 @@ class Browser:
             # Action buttons
             if self._model_class.odm_ui_entity_actions_enabled() and \
                     (self._model_class.odm_ui_modification_allowed() or self._model_class.odm_ui_deletion_allowed()):
-                actions = self._get_entity_action_buttons(entity)
-                for btn_data in entity.odm_ui_browser_entity_actions():
+
+                actions = _html.Div(css='entity-actions', data_entity_id=str(entity.id), child_sep='&nbsp;')
+                for btn_data in entity.odm_ui_browser_entity_actions(self):
                     color = 'btn btn-sm btn-' + btn_data.get('color', 'default btn-light')
                     title = btn_data.get('title', '')
-                    ep = btn_data.get('ep')
-                    url = _router.rule_url(ep, {'ids': str(entity.id)}) if ep else '#'
-                    css = btn_data.get('css', '')
-                    btn = _html.A(href=url, css=color + css, title=title)
-                    btn.append(_html.I(css='fa fa-fw fa-' + btn_data.get('icon', 'question')))
+                    url = btn_data.get('url')
+                    if not url:
+                        rule = btn_data.get('rule')
+                        url = _router.rule_url(rule, {'ids': str(entity.id)}) if rule else '#'
+                    btn = _html.A(href=url, css=color + ' ' + btn_data.get('css', ''), title=title, role='button')
+                    if btn_data.get('disabled'):
+                        btn.set_attr('aria_disabled', 'true')
+                        btn.add_css('disabled')
+                    btn.append(_html.I(css=btn_data.get('icon', 'fa fas fa-fw fa-question')))
                     actions.append(btn)
-                    actions.append(_html.TagLessElement('&nbsp;'))
 
                 if not len(actions.children):
                     actions.set_attr('css', actions.get_attr('css') + ' empty')
@@ -230,37 +251,6 @@ class Browser:
             r['rows'].append(fields_data)
 
         return r
-
-    def _get_entity_action_buttons(self, entity: _model.UIEntity) -> _html.Div:
-        """Get action buttons for entity.
-        """
-        group = _html.Div(css='entity-actions', data_entity_id=str(entity.id))
-
-        if entity.odm_ui_modification_allowed() and entity.odm_auth_check_permission('modify'):
-            m_form_url = _router.rule_url(self._m_form_rule, {
-                'model': entity.model,
-                'eid': str(entity.id),
-                '__redirect': _router.rule_url(self._browse_rule, {'model': entity.model}),
-            })
-            title = _lang.t('odm_ui@modify')
-            a = _html.A(css='btn btn-sm btn-default btn-light', href=m_form_url, title=title)
-            a.append(_html.I(css='fa fas fa-fw fa-fw fa-edit'))
-            group.append(a)
-            group.append(_html.TagLessElement('&nbsp;'))
-
-        if entity.odm_ui_deletion_allowed() and entity.odm_auth_check_permission('delete'):
-            d_form_url = _router.rule_url(self._d_form_rule, {
-                'model': entity.model,
-                'ids': str(entity.id),
-                '__redirect': _router.rule_url(self._browse_rule, {'model': entity.model}),
-            })
-            title = _lang.t('odm_ui@delete')
-            a = _html.A(css='btn btn-sm btn-danger', href=d_form_url, title=title)
-            a.append(_html.I(css='fa fas fa-fw fa-remove fa-times'))
-            group.append(a)
-            group.append(_html.TagLessElement('&nbsp;'))
-
-        return group
 
     def render(self) -> str:
         # 'Create' toolbar button

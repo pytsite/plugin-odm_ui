@@ -4,7 +4,7 @@ __author__ = 'Oleksandr Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
-from typing import Tuple as _Tuple, Dict as _Dict, Type as _Type
+from typing import Tuple as _Tuple, Dict as _Dict, Type as _Type, List as _List
 from pytsite import router as _router, lang as _lang
 from plugins import widget as _widget, odm as _odm, odm_auth as _odm_auth, form as _form
 
@@ -71,10 +71,35 @@ class UIEntity(_odm_auth.model.OwnedEntity):
         """
         return True
 
-    def odm_ui_browser_entity_actions(self) -> _Tuple[_Dict, ...]:
+    def odm_ui_browser_entity_actions(self, browser) -> _List[_Dict]:
         """Get actions buttons data for single data row.
         """
-        return ()
+        r = []
+
+        if self.odm_ui_modification_allowed() and self.odm_auth_check_permission('modify'):
+            r.append({
+                'url': _router.rule_url(browser.m_form_rule, {
+                    'model': self.model,
+                    'eid': str(self.id),
+                    '__redirect': _router.rule_url(browser.browse_rule, {'model': self.model}),
+                }),
+                'title': _lang.t('odm_ui@modify'),
+                'icon': 'fa fas fa-fw fa-fw fa-edit',
+            })
+
+        if self.odm_ui_deletion_allowed() and self.odm_auth_check_permission('delete'):
+            r.append({
+                'url': _router.rule_url(browser.d_form_rule, {
+                    'model': self.model,
+                    'ids': str(self.id),
+                    '__redirect': _router.rule_url(browser.browse_rule, {'model': self.model}),
+                }),
+                'title': _lang.t('odm_ui@delete'),
+                'icon': 'fa fas fa-fw fa-fw fa-remove fa-times',
+                'color': 'danger',
+            })
+
+        return r
 
     def odm_ui_mass_action_entity_description(self) -> str:
         """Get entity description on mass action forms.

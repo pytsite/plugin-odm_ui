@@ -4,6 +4,13 @@
 ## Changelog
 
 
+### 5.2 (2018-11-25)
+
+- New properties in `Browser`: `browse_rule`, `m_form_rule`,
+  `d_form_rule`.
+- Signature of `UIEntity.odm_ui_browser_entity_actions()` changed.
+
+
 ### 5.1.3 (2018-11-16)
 
 Sorting error fixed in `GetWidgetEntitySelect` controller.
