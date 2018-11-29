@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 5.2.1 (2018-11-29)
+
+Type hint fixed.
+
+
 ### 5.2 (2018-11-25)
 
 - New properties in `Browser`: `browse_rule`, `m_form_rule`,

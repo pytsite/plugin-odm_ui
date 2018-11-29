@@ -4,7 +4,7 @@ __author__ = 'Oleksandr Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
-from typing import Tuple as _Tuple, Dict as _Dict, Type as _Type, List as _List
+from typing import Tuple as _Tuple, Dict as _Dict, Type as _Type, List as _List, Union as _Union
 from pytsite import router as _router, lang as _lang
 from plugins import widget as _widget, odm as _odm, odm_auth as _odm_auth, form as _form
 
@@ -42,7 +42,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
         """
         return ()
 
-    def odm_ui_browser_row(self) -> _Tuple:
+    def odm_ui_browser_row(self) -> _Union[tuple, list, dict]:
         """Get single UI browser row.
         """
         return ()
