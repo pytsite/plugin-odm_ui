@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 5.2.2 (2018-12-04)
+
+`UIEntity.as_jsonable()` fixed.
+
+
 ### 5.2.1 (2018-11-29)
 
 Type hint fixed.

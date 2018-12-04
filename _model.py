@@ -314,17 +314,9 @@ class UIEntity(_odm_auth.model.OwnedEntity):
     def as_jsonable(self, **kwargs) -> dict:
         r = super().as_jsonable(**kwargs)
 
-        modify_perm = self.odm_auth_check_permission('modify')
-        delete_perm = self.odm_auth_check_permission('delete')
-
-        r['permissions'] = {
-            'modify': modify_perm,
-            'delete': delete_perm,
+        r['urls'] = {
+            'view': self.url,
+            'modify': self.modify_url,
         }
-
-        r['url'] = self.url
-
-        if modify_perm:
-            r['modify_url'] = self.modify_url
 
         return r
