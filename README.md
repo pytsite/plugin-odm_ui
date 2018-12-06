@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 5.2.3 (2018-12-06)
+
+Unnecessary exception throwing suppressed.
+
+
 ### 5.2.2 (2018-12-04)
 
 `UIEntity.as_jsonable()` fixed.

@@ -314,9 +314,12 @@ class UIEntity(_odm_auth.model.OwnedEntity):
     def as_jsonable(self, **kwargs) -> dict:
         r = super().as_jsonable(**kwargs)
 
-        r['urls'] = {
-            'view': self.url,
-            'modify': self.modify_url,
-        }
+        try:
+            r['urls'] = {
+                'view': self.url,
+                'modify': self.modify_url,
+            }
+        except NotImplementedError:
+            pass
 
         return r
