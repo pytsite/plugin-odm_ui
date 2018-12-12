@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 5.3.2 (2018-12-12)
+
+Typo fixed.
+
+
 ### 5.3.1 (2018-12-12)
 
 Model checking added in `widget.EntitySlots`.

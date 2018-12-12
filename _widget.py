@@ -393,7 +393,7 @@ class EntitySlots(_widget.Abstract):
 
         model_cls = _odm.get_model_class(self._model)
         if not (issubclass(model_cls, _odm_http_api.HTTPAPIEntityMixin) and model_cls.odm_http_api_enabled()):
-            raise TypeError("Model '{}' does not support transfer via HTTP API")
+            raise TypeError("Model '{}' does not support transfer via HTTP API".format(self._model))
 
         self._ignore_missing_entities = kwargs.get('ignore_missing_entities', False)
         self._ignore_invalid_refs = kwargs.get('ignore_invalid_refs', False)
