@@ -17,6 +17,7 @@ export default class EntitySlots extends React.Component {
         entityUrlField: PropTypes.string,
         entityThumbField: PropTypes.string,
         maxSlots: PropTypes.number,
+        modalOkButtonCaption: PropTypes.string,
         modalTitle: PropTypes.string,
         model: PropTypes.string.isRequired,
         name: PropTypes.string.isRequired,
@@ -163,11 +164,12 @@ export default class EntitySlots extends React.Component {
             <input type={'hidden'} name={`${this.props.name}[]`} value={''}/>
 
             <TwoButtonsModal isOpen={this.state.isModalOpened}
-                             title={this.props.modalTitle}
+                             isOkButtonDisabled={!this.state.selectedEntityRef}
+                             okButtonCaption={this.props.modalOkButtonCaption}
                              onToggle={this.onModalToggle}
                              onClickCancel={() => this.setState({selectedEntityRef: null})}
                              onClickOk={this.onModalClickOk}
-                             isOkButtonDisabled={!this.state.selectedEntityRef}
+                             title={this.props.modalTitle}
 
             >
                 <Select2 options={selectOpts}
@@ -195,6 +197,7 @@ setupWidget('plugins.odm_ui._widget.EntitySlots', widget => {
                            entityThumbField={widget.data('entityThumbField')}
                            entityUrlField={widget.data('entityUrlField')}
                            maxSlots={widget.data('maxSlots')}
+                           modalOkButtonCaption={widget.data('modalOkButtonCaption')}
                            modalTitle={widget.data('modalTitle')}
                            model={widget.data('model')}
                            name={widget.uid}

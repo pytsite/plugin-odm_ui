@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 5.4 (2018-12-12)
+
+New property: `widget.EntitySlots.modal_ok_button_caption`.
+
+
 ### 5.3.3 (2018-12-12)
 
 CSS of `widget.EntitySlots` fixed.

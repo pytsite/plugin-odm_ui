@@ -384,6 +384,14 @@ class EntitySlots(_widget.Abstract):
     def empty_slot_title(self, value: str):
         self._empty_slot_title = value
 
+    @property
+    def modal_ok_button_caption(self) -> str:
+        return self._modal_ok_button_caption
+
+    @modal_ok_button_caption.setter
+    def modal_ok_button_caption(self, value: str):
+        self._modal_ok_button_caption = value
+
     def __init__(self, uid: str, **kwargs):
         super().__init__(uid, **kwargs)
 
@@ -406,6 +414,7 @@ class EntitySlots(_widget.Abstract):
         self._search_delay = kwargs.get('search_delay', 250)
         self._search_minimum_input_length = kwargs.get('search_minimum_input_length', 1)
         self._modal_title = kwargs.get('modal_title', _lang.t('odm_ui@search'))
+        self._modal_ok_button_caption = kwargs.get('modal_ok_button_caption', _lang.t('odm_ui@add'))
         self._empty_slot_title = kwargs.get('empty_slot_title', _lang.t('odm_ui@add'))
 
         self._css += ' widget-odm-ui-entity-slots'
@@ -432,6 +441,7 @@ class EntitySlots(_widget.Abstract):
             'entity_thumb_field': self._entity_thumb_field,
             'entity_title_field': self._entity_title_field,
             'entity_url_field': self._entity_url_field,
+            'modal_ok_button_caption': self._modal_ok_button_caption,
             'modal_title': self._modal_title,
             'model': self._model,
             'search_by': self._search_by,
