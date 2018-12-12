@@ -8,7 +8,7 @@ from typing import List as _List, Callable as _Callable, Union as _Union, Iterab
 from pyuca import Collator as _Collator
 from json import dumps as _json_dumps
 from pytsite import lang as _lang, html as _html
-from plugins import widget as _widget, odm as _odm, http_api as _http_api
+from plugins import widget as _widget, odm as _odm, http_api as _http_api, odm_http_api as _odm_http_api
 
 _pyuca_col = _Collator()
 
@@ -390,6 +390,10 @@ class EntitySlots(_widget.Abstract):
         self._model = kwargs.get('model')
         if not self._model:
             raise TypeError("'model' argument is not specified")
+
+        model_cls = _odm.get_model_class(self._model)
+        if not (issubclass(model_cls, _odm_http_api.HTTPAPIEntityMixin) and model_cls.odm_http_api_enabled()):
+            raise TypeError("Model '{}' does not support transfer via HTTP API")
 
         self._ignore_missing_entities = kwargs.get('ignore_missing_entities', False)
         self._ignore_invalid_refs = kwargs.get('ignore_invalid_refs', False)

@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 5.3.1 (2018-12-12)
+
+Model checking added in `widget.EntitySlots`.
+
+
 ### 5.3 (2018-12-12)
 
 - Support of `pytsite-8.4`.
