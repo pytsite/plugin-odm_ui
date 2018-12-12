@@ -408,6 +408,8 @@ class EntitySlots(_widget.Abstract):
         self._modal_title = kwargs.get('modal_title', _lang.t('odm_ui@search'))
         self._empty_slot_title = kwargs.get('empty_slot_title', _lang.t('odm_ui@add'))
 
+        self._css += ' widget-odm-ui-entity-slots'
+
     def get_val(self, **kwargs) -> _Iterable[str]:
         return super().get_val(**kwargs)
 

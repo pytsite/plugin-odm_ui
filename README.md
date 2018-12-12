@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 5.3.3 (2018-12-12)
+
+CSS of `widget.EntitySlots` fixed.
+
+
 ### 5.3.2 (2018-12-12)
 
 Typo fixed.
