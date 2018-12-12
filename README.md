@@ -4,6 +4,12 @@
 ## Changelog
 
 
+### 5.3 (2018-12-12)
+
+- Support of `pytsite-8.4`.
+- New widget and React component: `EntitySlots`.
+
+
 ### 5.2.3 (2018-12-06)
 
 Unnecessary exception throwing suppressed.

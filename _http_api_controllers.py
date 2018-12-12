@@ -59,8 +59,8 @@ class GetWidgetEntitySelect(_routing.Controller):
         self.args.add_formatter('model', _formatters.Str(max_len=32))
         self.args.add_formatter('sort_by', _formatters.Str(max_len=32))
         self.args.add_formatter('limit', _formatters.PositiveInt(10, 100))
-        self.args.add_formatter('entity_title_args', _formatters.JSONObjectToDict())
-        self.args.add_formatter('exclude', _formatters.JSONArrayToList())
+        self.args.add_formatter('entity_title_args', _formatters.JSONObject())
+        self.args.add_formatter('exclude', _formatters.JSONArray())
         self.args.add_formatter('depth_indent', _formatters.Str('-'))
 
         self.args.add_formatter('sort_order', _formatters.Str(lower=True))

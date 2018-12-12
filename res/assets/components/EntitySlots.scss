@@ -1,0 +1,22 @@
+.widget-entityslots {
+
+  .slot {
+    &:hover {
+      .entity-actions {
+        display: block;
+      }
+    }
+
+    .entity-actions {
+      display: none;
+      position: absolute;
+      top: 0;
+      right: 0;
+    }
+  }
+
+
+  .entity-thumbnail {
+    max-width: 100%;
+  }
+}

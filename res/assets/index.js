@@ -1,5 +1,6 @@
-import './browser.scss';
 import $ from 'jquery';
+import './browser.scss';
+import './components/EntitySlots'
 
 $('.odm-ui-m-form').on('forward:form:pytsite', function () {
     setTimeout(() => {

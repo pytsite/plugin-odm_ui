@@ -4,10 +4,10 @@ __author__ = 'Oleksandr Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
-from typing import List as _List, Callable as _Callable, Union as _Union
+from typing import List as _List, Callable as _Callable, Union as _Union, Iterable as _Iterable
 from pyuca import Collator as _Collator
 from json import dumps as _json_dumps
-from pytsite import lang as _lang
+from pytsite import lang as _lang, html as _html
 from plugins import widget as _widget, odm as _odm, http_api as _http_api
 
 _pyuca_col = _Collator()
@@ -285,3 +285,155 @@ class EntityCheckboxes(_widget.select.Checkboxes):
             self._items.append((str(e), str(caption)))
 
         return super()._get_element()
+
+
+class EntitySlots(_widget.Abstract):
+    @property
+    def ignore_missing_entities(self) -> bool:
+        return self._ignore_missing_entities
+
+    @ignore_missing_entities.setter
+    def ignore_missing_entities(self, value: bool):
+        self._ignore_missing_entities = value
+
+    @property
+    def ignore_invalid_refs(self) -> bool:
+        return self._ignore_invalid_refs
+
+    @ignore_invalid_refs.setter
+    def ignore_invalid_refs(self, value: bool):
+        self._ignore_invalid_refs = value
+
+    @property
+    def sort_by(self) -> str:
+        return self._sort_by
+
+    @sort_by.setter
+    def sort_by(self, value: str):
+        self._sort_by = value
+
+    @property
+    def sort_order(self) -> int:
+        return self._sort_order
+
+    @sort_order.setter
+    def sort_order(self, value: int):
+        self._sort_order = value
+
+    @property
+    def entity_title_field(self) -> str:
+        return self._entity_title_field
+
+    @entity_title_field.setter
+    def entity_title_field(self, value: str):
+        self._entity_title_field = value
+
+    @property
+    def entity_url_field(self) -> str:
+        return self._entity_url_field
+
+    @entity_url_field.setter
+    def entity_url_field(self, value: str):
+        self._entity_url_field = value
+
+    @property
+    def entity_thumb_field(self) -> str:
+        return self._entity_thumb_field
+
+    @entity_thumb_field.setter
+    def entity_thumb_field(self, value: str):
+        self._entity_thumb_field = value
+
+    @property
+    def search_by(self) -> str:
+        return self._search_by
+
+    @search_by.setter
+    def search_by(self, value: str):
+        self._search_by = value
+
+    @property
+    def search_minimum_input_length(self) -> int:
+        return self._search_minimum_input_length
+
+    @search_minimum_input_length.setter
+    def search_minimum_input_length(self, value: int):
+        self._search_minimum_input_length = value
+
+    @property
+    def search_delay(self) -> int:
+        return self._search_delay
+
+    @search_delay.setter
+    def search_delay(self, value: int):
+        self._search_delay = value
+
+    @property
+    def modal_title(self) -> str:
+        return self._modal_title
+
+    @modal_title.setter
+    def modal_title(self, value: str):
+        self._modal_title = value
+
+    @property
+    def empty_slot_title(self) -> str:
+        return self._empty_slot_title
+
+    @empty_slot_title.setter
+    def empty_slot_title(self, value: str):
+        self._empty_slot_title = value
+
+    def __init__(self, uid: str, **kwargs):
+        super().__init__(uid, **kwargs)
+
+        self._model = kwargs.get('model')
+        if not self._model:
+            raise TypeError("'model' argument is not specified")
+
+        self._ignore_missing_entities = kwargs.get('ignore_missing_entities', False)
+        self._ignore_invalid_refs = kwargs.get('ignore_invalid_refs', False)
+        self._sort_by = kwargs.get('sort_by')
+        self._sort_order = kwargs.get('sort_order', _odm.I_ASC)
+        self._entity_title_field = kwargs.get('entity_title_field', 'title')
+        self._entity_url_field = kwargs.get('entity_url_field', 'url')
+        self._entity_thumb_field = kwargs.get('entity_thumb_field', 'thumbnail')
+        self._search_by = kwargs.get('search_by')
+        self._search_delay = kwargs.get('search_delay', 250)
+        self._search_minimum_input_length = kwargs.get('search_minimum_input_length', 1)
+        self._modal_title = kwargs.get('modal_title', _lang.t('odm_ui@search'))
+        self._empty_slot_title = kwargs.get('empty_slot_title', _lang.t('odm_ui@add'))
+
+    def get_val(self, **kwargs) -> _Iterable[str]:
+        return super().get_val(**kwargs)
+
+    def set_val(self, value: _Union[_Iterable[_odm.Entity], _Iterable[str]]):
+        try:
+            super().set_val([_odm.get_by_ref(v).ref for v in value if v] if value else [])
+        except _odm.error.InvalidReference as e:
+            if not self._ignore_invalid_refs:
+                raise e
+        except _odm.error.EntityNotFound as e:
+            if not self._ignore_missing_entities:
+                raise e
+
+        return self
+
+    def _get_element(self, **kwargs) -> _html:
+        self.data.update({
+            'enabled': self._enabled,
+            'empty_slot_title': self._empty_slot_title,
+            'entity_thumb_field': self._entity_thumb_field,
+            'entity_title_field': self._entity_title_field,
+            'entity_url_field': self._entity_url_field,
+            'modal_title': self._modal_title,
+            'model': self._model,
+            'search_by': self._search_by,
+            'search_delay': self._search_delay,
+            'search_minimum_input_length': self._search_minimum_input_length,
+            'sort_by': self._sort_by,
+            'sort_order': self._sort_order,
+            'value': _json_dumps(self.get_val()),
+        })
+
+        return _html.Div(css='widget-component')
