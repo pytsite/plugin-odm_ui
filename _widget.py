@@ -392,6 +392,14 @@ class EntitySlots(_widget.Abstract):
     def modal_ok_button_caption(self, value: str):
         self._modal_ok_button_caption = value
 
+    @property
+    def exclude(self) -> _List[str]:
+        return self._exclude
+
+    @exclude.setter
+    def exclude(self, value: _List):
+        self._exclude = value
+
     def __init__(self, uid: str, **kwargs):
         super().__init__(uid, **kwargs)
 
@@ -403,6 +411,10 @@ class EntitySlots(_widget.Abstract):
         if not (issubclass(model_cls, _odm_http_api.HTTPAPIEntityMixin) and model_cls.odm_http_api_enabled()):
             raise TypeError("Model '{}' does not support transfer via HTTP API".format(self._model))
 
+        exclude = kwargs.get('exclude', [])
+        if not isinstance('exclude', (list, tuple)):
+            exclude = [exclude]
+
         self._ignore_missing_entities = kwargs.get('ignore_missing_entities', False)
         self._ignore_invalid_refs = kwargs.get('ignore_invalid_refs', False)
         self._sort_by = kwargs.get('sort_by')
@@ -410,6 +422,7 @@ class EntitySlots(_widget.Abstract):
         self._entity_title_field = kwargs.get('entity_title_field', 'title')
         self._entity_url_field = kwargs.get('entity_url_field', 'url')
         self._entity_thumb_field = kwargs.get('entity_thumb_field', 'thumbnail')
+        self._exclude = [_odm.get_by_ref(v).ref for v in exclude if v]
         self._search_by = kwargs.get('search_by')
         self._search_delay = kwargs.get('search_delay', 250)
         self._search_minimum_input_length = kwargs.get('search_minimum_input_length', 1)
@@ -441,6 +454,7 @@ class EntitySlots(_widget.Abstract):
             'entity_thumb_field': self._entity_thumb_field,
             'entity_title_field': self._entity_title_field,
             'entity_url_field': self._entity_url_field,
+            'exclude': _json_dumps(self._exclude),
             'modal_ok_button_caption': self._modal_ok_button_caption,
             'modal_title': self._modal_title,
             'model': self._model,

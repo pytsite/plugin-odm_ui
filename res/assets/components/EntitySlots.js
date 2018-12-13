@@ -16,6 +16,7 @@ export default class EntitySlots extends React.Component {
         entityTitleField: PropTypes.string.isRequired,
         entityUrlField: PropTypes.string,
         entityThumbField: PropTypes.string,
+        exclude: PropTypes.arrayOf(PropTypes.string),
         maxSlots: PropTypes.number,
         modalOkButtonCaption: PropTypes.string,
         modalTitle: PropTypes.string,
@@ -34,6 +35,7 @@ export default class EntitySlots extends React.Component {
         entityTitleField: 'title',
         entityThumbField: 'thumbnail',
         entityUrlField: 'url',
+        exclude: [],
         maxSlots: 1000,
         searchDelay: 250,
         searchMinimumInputLength: 1,
@@ -143,7 +145,7 @@ export default class EntitySlots extends React.Component {
                 url: httpApi.url(`odm/entities/${this.props.model}`, {
                     sort_by: this.props.sortBy,
                     sort_order: this.props.sortOrder,
-                    exclude: JSON.stringify(Object.keys(this.state.entities)),
+                    exclude: JSON.stringify(Object.keys(this.state.entities).concat(this.props.exclude)),
                 }),
                 data: params => ({
                     search_by: this.props.searchBy,
@@ -196,6 +198,7 @@ setupWidget('plugins.odm_ui._widget.EntitySlots', widget => {
                            entityTitleField={widget.data('entityTitleField')}
                            entityThumbField={widget.data('entityThumbField')}
                            entityUrlField={widget.data('entityUrlField')}
+                           exclude={widget.data('exclude')}
                            maxSlots={widget.data('maxSlots')}
                            modalOkButtonCaption={widget.data('modalOkButtonCaption')}
                            modalTitle={widget.data('modalTitle')}

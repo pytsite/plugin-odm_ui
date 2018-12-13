@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 5.5 (2018-12-12)
+
+New property: `widget.EntitySlots.exclude`.
+
+
 ### 5.4 (2018-12-12)
 
 New property: `widget.EntitySlots.modal_ok_button_caption`.
