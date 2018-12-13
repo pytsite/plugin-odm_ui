@@ -131,11 +131,18 @@ export default class EntitySlots extends React.Component {
             </div>
         }
 
-        return <React.Fragment>
-            <input type={'hidden'} name={`${this.props.name}[]`} value={entity.ref}/>
+        let content = <React.Fragment>
             {actions}
             {thumb}
             {title}
+        </React.Fragment>;
+
+        if (!this.props.enabled && entity.hasOwnProperty(this.props.entityUrlField))
+            content = <a href={entity[this.props.entityUrlField]}>{content}</a>;
+
+        return <React.Fragment>
+            <input type={'hidden'} name={`${this.props.name}[]`} value={entity.ref}/>
+            {content}
         </React.Fragment>
     }
 

@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 5.5.1 (2018-12-12)
+
+`widget.EntitySlots` fixed.
+
+
 ### 5.5 (2018-12-12)
 
 New property: `widget.EntitySlots.exclude`.
