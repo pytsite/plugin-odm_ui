@@ -113,7 +113,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
         """
         return 'odm_ui@admin_browse'
 
-    def odm_ui_browse_url(self, args: dict = None):
+    def odm_ui_browse_url(self, args: dict = None, **kwargs):
         """Get browse URL
         """
         if args is None:
@@ -123,7 +123,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
             'model': self.model
         })
 
-        return _router.rule_url(self.odm_ui_browse_rule(), args)
+        return _router.rule_url(self.odm_ui_browse_rule(), args, **kwargs)
 
     @classmethod
     def odm_ui_m_form_rule(cls) -> str:
@@ -131,7 +131,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
         """
         return 'odm_ui@admin_m_form'
 
-    def odm_ui_m_form_url(self, args: dict = None):
+    def odm_ui_m_form_url(self, args: dict = None, **kwargs):
         """Get modify form URL
         """
         if args is None:
@@ -143,7 +143,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
             '__redirect': 'ENTITY_VIEW',
         })
 
-        return _router.rule_url(self.odm_ui_m_form_rule(), args)
+        return _router.rule_url(self.odm_ui_m_form_rule(), args, **kwargs)
 
     @property
     def modify_url(self) -> str:
@@ -243,16 +243,16 @@ class UIEntity(_odm_auth.model.OwnedEntity):
     def odm_ui_d_form_rule(cls) -> str:
         return 'odm_ui@admin_d_form'
 
-    def odm_ui_d_form_url(self, ajax: bool = False) -> str:
-        args = {
+    def odm_ui_d_form_url(self, args: dict = None, **kwargs) -> str:
+        if args is None:
+            args = {}
+
+        args.update({
             'model': self.model,
             'eids': str(self.id)
-        }
+        })
 
-        if ajax:
-            args['ajax'] = 'true'
-
-        return _router.rule_url(self.odm_ui_d_form_rule(), args)
+        return _router.rule_url(self.odm_ui_d_form_rule(), args, **kwargs)
 
     def odm_ui_d_form_setup(self, frm: _form.Form):
         """Hook
@@ -280,7 +280,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
         """
         raise NotImplementedError('Not implemented yet')
 
-    def odm_ui_view_url(self, args: dict = None) -> str:
+    def odm_ui_view_url(self, args: dict = None, **kwargs) -> str:
         if self.is_new:
             raise RuntimeError("Cannot generate view URL for non-saved entity of model '{}'".format(self.model))
 
@@ -292,7 +292,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
             'eid': str(self.id),
         })
 
-        return _router.rule_url(self.odm_ui_view_rule(), args)
+        return _router.rule_url(self.odm_ui_view_rule(), args, **kwargs)
 
     @classmethod
     def odm_ui_widget_select_search_entities(cls, f: _odm.Finder, args: dict):

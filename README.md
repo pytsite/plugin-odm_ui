@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 5.6 (2018-12-20)
+
+`UIEntity.*_url()` methods unified and got `**kwargs`.
+
+
 ### 5.5.1 (2018-12-12)
 
 `widget.EntitySlots` fixed.
