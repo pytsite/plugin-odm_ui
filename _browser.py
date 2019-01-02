@@ -41,12 +41,13 @@ class Browser:
             raise TypeError('Subclass of {} expected, got'.format(_widget.misc.DataTable, widget_class))
         self._widget = widget_class(
             uid='odm-ui-browser-' + model,
-            rows_url=_http_api.url('odm_ui@browse_rows', {
+            rows_url=_http_api.url('odm_ui@get_browser_rows', {
                 'model': self._model,
                 'browse_rule': self._browse_rule,
                 'm_form_rule': self._m_form_rule,
                 'd_form_rule': self._d_form_rule,
             }),
+            update_rows_url=_http_api.url('odm_ui@put_browser_rows')
         )
 
         # Call model's class to perform setup tasks
@@ -62,7 +63,7 @@ class Browser:
         # Actions column
         if self._model_class.odm_ui_entity_actions_enabled() and \
                 (self._model_class.odm_ui_modification_allowed() or self._model_class.odm_ui_deletion_allowed()):
-            self.insert_data_field('_actions', 'odm_ui@actions', False)
+            self.insert_data_field('entity-actions', 'odm_ui@actions', False)
 
         # Metatags
         _metatag.t_set('title', self._model_class.t('odm_ui_browser_title_' + self._model))
@@ -204,8 +205,8 @@ class Browser:
 
             # Build row's cells
             fields_data = {
-                '__id': str(entity.id),
-                '__parent': str(entity.parent.id) if entity.parent else None,
+                '__id': entity.ref,
+                '__parent': entity.parent.ref if entity.parent else None,
             }
             if isinstance(row, (list, tuple)):
                 expected_row_length = len(self.data_fields)
@@ -228,7 +229,7 @@ class Browser:
             if self._model_class.odm_ui_entity_actions_enabled() and \
                     (self._model_class.odm_ui_modification_allowed() or self._model_class.odm_ui_deletion_allowed()):
 
-                actions = _html.Div(css='entity-actions', data_entity_id=str(entity.id), child_sep='&nbsp;')
+                actions = _html.TagLessElement(child_sep='&nbsp;')
                 for btn_data in entity.odm_ui_browser_entity_actions(self):
                     color = 'btn btn-sm btn-' + btn_data.get('color', 'default btn-light')
                     title = btn_data.get('title', '')
@@ -246,7 +247,7 @@ class Browser:
                 if not len(actions.children):
                     actions.set_attr('css', actions.get_attr('css') + ' empty')
 
-                fields_data['_actions'] = actions.render()
+                fields_data['entity-actions'] = actions.render()
 
             r['rows'].append(fields_data)
 

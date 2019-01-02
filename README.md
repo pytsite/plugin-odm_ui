@@ -4,6 +4,13 @@
 ## Changelog
 
 
+### 6.0 (2019-01-02)
+
+- New controller added: `odm_ui@put_browser_rows`.
+- Paths and names of existing controllers changed.
+- Support of `widget-4.11`.
+
+
 ### 5.6 (2018-12-20)
 
 `UIEntity.*_url()` methods unified and got `**kwargs`.

@@ -13,7 +13,7 @@ from . import _browser, _model
 _pyuca_col = _Collator()
 
 
-class GetBrowseRows(_routing.Controller):
+class GetBrowserRows(_routing.Controller):
     """Get browser rows
     """
 
@@ -50,6 +50,24 @@ class GetBrowseRows(_routing.Controller):
             return self.redirect(_http_api.url('odm_ui@browse_rows', r_args))
 
         return r
+
+
+class PutBrowserRows(_routing.Controller):
+    def __init__(self):
+        super().__init__()
+
+        self.args.add_formatter('rows', _formatters.JSONArray())
+
+    def exec(self):
+        for row in self.arg('rows'):
+            e = _odm.get_by_ref(row['ref'])
+            e.f_set_multiple({
+                '_parent': row['parent'],
+                'order': row['order'],
+            })
+            e.save()
+
+        return {'status': True}
 
 
 class GetWidgetEntitySelect(_routing.Controller):
