@@ -76,7 +76,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
         """
         r = []
 
-        if self.odm_ui_modification_allowed() and self.odm_auth_check_permission('modify'):
+        if self.odm_ui_modification_allowed() and self.odm_auth_check_entity_permissions('modify'):
             r.append({
                 'url': _router.rule_url(browser.m_form_rule, {
                     'model': self.model,
@@ -87,7 +87,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
                 'icon': 'fa fas fa-fw fa-fw fa-edit',
             })
 
-        if self.odm_ui_deletion_allowed() and self.odm_auth_check_permission('delete'):
+        if self.odm_ui_deletion_allowed() and self.odm_auth_check_entity_permissions('delete'):
             r.append({
                 'url': _router.rule_url(browser.d_form_rule, {
                     'model': self.model,
@@ -294,11 +294,15 @@ class UIEntity(_odm_auth.model.OwnedEntity):
 
         return _router.rule_url(self.odm_ui_view_rule(), args, **kwargs)
 
-    @classmethod
-    def odm_ui_widget_select_search_entities(cls, f: _odm.Finder, args: dict):
+    def odm_ui_widget_select_search_entities(self, f: _odm.Finder, args: dict):
         """Hook
         """
         pass
+
+    def odm_ui_widget_select_search_entities_is_visible(self, args: dict) -> bool:
+        """Hook
+        """
+        return True
 
     def odm_ui_widget_select_search_entities_title(self, args: dict) -> str:
         """Hook

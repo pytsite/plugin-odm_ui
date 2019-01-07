@@ -4,6 +4,13 @@
 ## Changelog
 
 
+### 6.1 (2019-01-07)
+
+- Support of `odm-5.7` and `odm_auth-3.0`.
+- New method
+  `UIEntity.odm_ui_widget_select_search_entities_is_visible()`.
+
+
 ### 6.0 (2019-01-02)
 
 - New controller added: `odm_ui@put_browser_rows`.

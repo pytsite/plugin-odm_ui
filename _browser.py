@@ -255,7 +255,7 @@ class Browser:
 
     def render(self) -> str:
         # 'Create' toolbar button
-        if self._mock.odm_ui_creation_allowed() and self._mock.odm_auth_check_permission('create'):
+        if self._mock.odm_ui_creation_allowed() and self._mock.odm_auth_check_entity_permissions('create'):
             create_form_url = _router.rule_url(self._m_form_rule, {
                 'model': self._model,
                 'eid': 0,

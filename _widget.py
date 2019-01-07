@@ -45,11 +45,11 @@ class EntitySelect(_widget.select.Select2):
     """
 
     @property
-    def model(self) -> str:
+    def model(self) -> _List[str]:
         return self._model
 
     @model.setter
-    def model(self, value: str):
+    def model(self, value: _List[str]):
         self._model = value
 
     @property
@@ -97,9 +97,13 @@ class EntitySelect(_widget.select.Select2):
         if not self._model:
             raise ValueError('Model is not specified')
 
+        if not isinstance(self._model, list):
+            self._model = [self._model]
+
         _sanitize_kwargs_exclude(kwargs)
 
-        kwargs.setdefault('ajax_url', _http_api.url('odm_ui@widget_entity_select', {'model': self._model}))
+        kwargs.setdefault('minimum_input_length', 3)
+        kwargs.setdefault('ajax_url', _http_api.url('odm_ui@widget_entity_select'))
         kwargs.setdefault('linked_select_ajax_query_attr', self._model)
 
         self._limit = kwargs.get('limit', 10)
@@ -113,6 +117,7 @@ class EntitySelect(_widget.select.Select2):
         super().__init__(uid, **kwargs)
 
         self._ajax_url_query.update({
+            'model': _json_dumps(self._model),
             'limit': self._limit,
             'sort_by': self._sort_by,
             'sort_order': self._sort_order,
@@ -232,7 +237,7 @@ class EntityCheckboxes(_widget.select.Checkboxes):
     def set_val(self, value):
         """Set value of the widget.
 
-        :param value: list[odm.models.ODMModel] | list[DBRef] | list[str]
+        :param value: list[odm.model.ODMModel] | list[DBRef] | list[str]
         """
 
         # Single string can be received from HTML form

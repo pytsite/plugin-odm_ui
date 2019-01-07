@@ -47,7 +47,7 @@ class GetBrowserRows(_routing.Controller):
             r_args['model'] = model
             r_args['offset'] = offset
 
-            return self.redirect(_http_api.url('odm_ui@browse_rows', r_args))
+            return self.redirect(_http_api.url('odm_ui@get_browser_rows', r_args))
 
         return r
 
@@ -74,7 +74,7 @@ class GetWidgetEntitySelect(_routing.Controller):
     def __init__(self):
         super().__init__()
 
-        self.args.add_formatter('model', _formatters.Str(max_len=32))
+        self.args.add_formatter('model', _formatters.JSONArray())
         self.args.add_formatter('sort_by', _formatters.Str(max_len=32))
         self.args.add_formatter('limit', _formatters.PositiveInt(10, 100))
         self.args.add_formatter('entity_title_args', _formatters.JSONObject())
@@ -88,21 +88,30 @@ class GetWidgetEntitySelect(_routing.Controller):
 
     @staticmethod
     def _find_entities(args: dict) -> _Iterable[_model.UIEntity]:
-        model = args['model']
+        models = args['model']
         sort_by = args['sort_by']
         sort_order = args['sort_order']
-        f = _odm.find(model).sort([(sort_by, sort_order)])
+        f = _odm.mfind(models)
+
+        if sort_by:
+            f.sort([(sort_by, sort_order)])
 
         exclude = args.get('exclude')
         if exclude:
             f.ninc('_ref', exclude)
 
         # Let model's class adjust finder
-        cls = _odm.get_model_class(model)  # type: _model.UIEntity
-        cls.odm_ui_widget_select_search_entities(f, args)
+        for model in models:
+            mock = _odm.dispense(model)  # type: _model.UIEntity
+            mock.odm_ui_widget_select_search_entities(f, args)
 
         # Collect entities
-        entities = list(f.get(args['limit']))
+        entities = []
+        for e in f.get():  # type:  _model.UIEntity
+            if e.odm_ui_widget_select_search_entities_is_visible(args):
+                entities.append(e)
+            if len(entities) - 1 == args['limit']:
+                break
 
         # Do additional sorting, because MongoDB does not sort all languages properly
         if entities and sort_by and isinstance(entities[0].get_field(sort_by), _odm.field.String):
@@ -136,10 +145,6 @@ class GetWidgetEntitySelect(_routing.Controller):
         return r
 
     def exec(self) -> dict:
-        cls = _odm.get_model_class(self.arg('model'))
-        if not issubclass(cls, _model.UIEntity):
-            raise self.not_found()
-
         items = []
         for entity in self._build_entities_flat_tree(self.args):
             # Title
