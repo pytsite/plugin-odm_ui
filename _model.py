@@ -26,7 +26,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
         pass
 
     @classmethod
-    def odm_ui_browser_search(cls, finder: _odm.Finder, query: str):
+    def odm_ui_browser_search(cls, finder: _odm.SingleModelFinder, query: str):
         """Adjust ODM browser finder while performing search.
         """
         if finder.mock.has_text_index:
@@ -294,7 +294,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
 
         return _router.rule_url(self.odm_ui_view_rule(), args, **kwargs)
 
-    def odm_ui_widget_select_search_entities(self, f: _odm.Finder, args: dict):
+    def odm_ui_widget_select_search_entities(self, f: _odm.MultiModelFinder, args: dict):
         """Hook
         """
         pass

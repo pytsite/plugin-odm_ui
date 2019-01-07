@@ -139,7 +139,7 @@ class Browser:
     def remove_data_field(self, name: str):
         self._widget.remove_data_field(name)
 
-    def _default_finder_adjust(self, finder: _odm.Finder):
+    def _default_finder_adjust(self, finder: _odm.SingleModelFinder):
         pass
 
     def get_rows(self, offset: int = 0, limit: int = 0, sort_field: str = None, sort_order: _Union[int, str] = None,

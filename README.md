@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 6.1.1 (2019-01-07)
+
+Type hinting fix.
+
+
 ### 6.1 (2019-01-07)
 
 - Support of `odm-5.7` and `odm_auth-3.0`.
