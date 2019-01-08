@@ -22,29 +22,26 @@ class GetBrowserRows(_routing.Controller):
 
         self.args.add_formatter('offset', _formatters.PositiveInt())
         self.args.add_formatter('limit', _formatters.PositiveInt())
+        self.args.add_formatter('search', _formatters.Str(max_len=64))
         self.args.add_validation('order', _validation.rule.Enum(values=['asc', 'desc']))
 
     def exec(self) -> _Union:
-        model = self.arg('model')
-        offset = self.arg('offset', 0)
-        limit = self.arg('limit', 0)
-
         browser = _browser.Browser(
-            model=model,
+            model=self.arg('model'),
             browse_rule=self.arg('browse_rule'),
             m_form_rule=self.arg('m_form_rule'),
             d_form_rule=self.arg('d_form_rule'),
         )
 
-        r = browser.get_rows(offset, limit, self.arg('sort'), self.arg('order', 'asc'), self.arg('search'))
+        r = browser.get_rows(self.args)
 
         if r['total'] and not r['rows']:
-            offset -= limit
+            offset = self.arg('offset') - self.arg('limit')
             if offset < 0:
                 offset = 0
 
             r_args = self.request.inp
-            r_args['model'] = model
+            r_args['model'] = browser.model
             r_args['offset'] = offset
 
             return self.redirect(_http_api.url('odm_ui@get_browser_rows', r_args))

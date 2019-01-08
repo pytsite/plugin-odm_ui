@@ -4,6 +4,14 @@
 ## Changelog
 
 
+### 7.0 (2019-01-08)
+
+- New method added: `UIEntity.odm_ui_browser_setup_finder()`.
+- `UIEntity.odm_ui_browser_setup()` made non-static,
+- `UIEntity.odm_ui_browser_search()` removed.
+- `Browser.mock` and `Browser.finder_adjust` properties removed.
+
+
 ### 6.1.1 (2019-01-07)
 
 Type hinting fix.

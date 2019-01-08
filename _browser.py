@@ -4,10 +4,12 @@ __author__ = 'Oleksandr Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
-from typing import Callable as _Callable, Union as _Union
-from pytsite import router as _router, metatag as _metatag, lang as _lang, html as _html, events as _events
-from plugins import widget as _widget, auth as _auth, odm as _odm, permissions as _permissions, http_api as _http_api
-from . import _api, _model
+from typing import Union as _Union
+from pytsite import router as _router, metatag as _metatag, lang as _lang, html as _html, events as _events, \
+    routing as _routing
+from plugins import widget as _widget, auth as _auth, odm as _odm, permissions as _permissions, http_api as _http_api, \
+    odm_auth as _odm_auth
+from . import _api
 
 
 class Browser:
@@ -26,11 +28,7 @@ class Browser:
         # Model class
         self._model_class = _api.get_model_class(self._model)
 
-        # Entity mock
-        self._mock = _api.dispense_entity(self._model)
-
         self._current_user = _auth.get_current_user()
-        self._finder_adjust = self._default_finder_adjust
         self._browse_rule = kwargs.get('browse_rule', self._model_class.odm_ui_browse_rule())
         self._m_form_rule = kwargs.get('m_form_rule', self._model_class.odm_ui_m_form_rule())
         self._d_form_rule = kwargs.get('d_form_rule', self._model_class.odm_ui_d_form_rule())
@@ -51,7 +49,7 @@ class Browser:
         )
 
         # Call model's class to perform setup tasks
-        self._model_class.odm_ui_browser_setup(self)
+        _api.dispense_entity(self._model).odm_ui_browser_setup(self)
 
         # Notify external events listeners
         _events.fire('odm_ui@browser_setup.{}'.format(self._model), browser=self)
@@ -93,20 +91,6 @@ class Browser:
         return self._d_form_rule
 
     @property
-    def mock(self) -> _model.UIEntity:
-        """Get entity mock
-        """
-        return self._mock
-
-    @property
-    def finder_adjust(self) -> _Callable:
-        return self._finder_adjust
-
-    @finder_adjust.setter
-    def finder_adjust(self, func: _Callable):
-        self._finder_adjust = func
-
-    @property
     def data_fields(self) -> _Union[list, tuple]:
         return self._widget.data_fields
 
@@ -139,22 +123,11 @@ class Browser:
     def remove_data_field(self, name: str):
         self._widget.remove_data_field(name)
 
-    def _default_finder_adjust(self, finder: _odm.SingleModelFinder):
-        pass
-
-    def get_rows(self, offset: int = 0, limit: int = 0, sort_field: str = None, sort_order: _Union[int, str] = None,
-                 search: str = None) -> dict:
+    def get_rows(self, args: _routing.ControllerArgs) -> dict:
         """Get browser rows.
         """
-        r = {'total': 0, 'rows': []}
-
-        # Sort order
-        if sort_order is None:
-            sort_order = self.default_sort_order
-
-        # Setup finder
+        # Instantiate finder
         finder = _odm.find(self._model)
-        self._finder_adjust(finder)
 
         # Admins and developers has full access
         show_all = self._current_user.is_admin
@@ -177,15 +150,12 @@ class Browser:
                     elif finder.mock.has_field('owner'):
                         finder.eq('owner', self._current_user.uid)
 
-        # Search
-        if search:
-            self._model_class.odm_ui_browser_search(finder, search)
-
-        # Counting total
-        r['total'] = finder.count()
+        # Let model to finish finder setup
+        _api.dispense_entity(self._model).odm_ui_browser_setup_finder(finder, args)
 
         # Sort
-        sort_order = _odm.I_DESC if sort_order in (-1, 'desc') else _odm.I_ASC
+        sort_order = _odm.I_DESC if args.get('order', self.default_sort_order) in (-1, 'desc') else _odm.I_ASC
+        sort_field = args.get('sort')
         if sort_field and finder.mock.has_field(sort_field):
             finder.sort([(sort_field, sort_order)])
         elif self.default_sort_field:
@@ -194,8 +164,14 @@ class Browser:
         # Get root elements first
         finder.add_sort('_parent', pos=0)
 
-        # Iterate over result and get content for table rows
-        cursor = finder.skip(offset).get(limit)
+        # Prepare result
+        r = {
+            'total': finder.count(),
+            'rows': []
+        }
+
+        # Build table rows
+        cursor = finder.skip(args.get('offset', 0)).get(args.get('limit', 0))
         for entity in cursor:
             row = entity.odm_ui_browser_row()
             _events.fire('odm_ui@browser_row.{}'.format(self._model), entity=entity, row=row)
@@ -255,7 +231,7 @@ class Browser:
 
     def render(self) -> str:
         # 'Create' toolbar button
-        if self._mock.odm_ui_creation_allowed() and self._mock.odm_auth_check_entity_permissions('create'):
+        if self._model_class.odm_ui_creation_allowed() and _odm_auth.check_model_permissions(self._model, 'create'):
             create_form_url = _router.rule_url(self._m_form_rule, {
                 'model': self._model,
                 'eid': 0,
@@ -268,7 +244,7 @@ class Browser:
             self._widget.toolbar.append(_html.Span('&nbsp;'))
 
         # 'Delete' toolbar button
-        if self._mock.odm_ui_deletion_allowed():
+        if self._model_class.odm_ui_deletion_allowed():
             delete_form_url = _router.rule_url(self._d_form_rule, {'model': self._model})
             title = _lang.t('odm_ui@delete_selected')
             btn = _html.A(href=delete_form_url, css='hidden btn btn-danger mass-action-button sr-only', title=title)

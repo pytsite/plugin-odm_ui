@@ -5,7 +5,7 @@ __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
 from typing import Tuple as _Tuple, Dict as _Dict, Type as _Type, List as _List, Union as _Union
-from pytsite import router as _router, lang as _lang
+from pytsite import router as _router, lang as _lang, routing as _routing
 from plugins import widget as _widget, odm as _odm, odm_auth as _odm_auth, form as _form
 
 
@@ -17,33 +17,31 @@ class UIEntity(_odm_auth.model.OwnedEntity):
     def odm_ui_browser_widget_class(cls) -> _Type[_widget.misc.DataTable]:
         return _widget.misc.BootstrapTable
 
-    @classmethod
-    def odm_ui_browser_setup(cls, browser):
+    def odm_ui_browser_setup(self, browser):
         """Setup ODM UI browser hook.
 
         :type browser: odm_ui.Browser
         """
         pass
 
-    @classmethod
-    def odm_ui_browser_search(cls, finder: _odm.SingleModelFinder, query: str):
-        """Adjust ODM browser finder while performing search.
+    def odm_ui_browser_setup_finder(self, finder: _odm.SingleModelFinder, args: _routing.ControllerArgs):
+        search_query = args.get('search')
+        if search_query:
+            if self.has_text_index:
+                finder.text(search_query)
+            else:
+                for name, field in self.fields.items():
+                    if isinstance(field, _odm.field.String):
+                        finder.or_regex(name, search_query, True)
+
+    def odm_ui_browser_row(self) -> _Union[tuple, list, dict]:
+        """Get single UI browser row.
         """
-        if finder.mock.has_text_index:
-            finder.text(query)
-        else:
-            for name, field in finder.mock.fields.items():
-                if isinstance(field, _odm.field.String):
-                    finder.or_regex(name, query, True)
+        return ()
 
     @classmethod
     def odm_ui_browser_mass_action_buttons(cls) -> _Tuple[_Dict, ...]:
         """Get toolbar mass actions buttons data.
-        """
-        return ()
-
-    def odm_ui_browser_row(self) -> _Union[tuple, list, dict]:
-        """Get single UI browser row.
         """
         return ()
 
