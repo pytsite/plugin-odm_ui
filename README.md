@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 7.0.2 (2019-01-10)
+
+Permissions checking fixed in `Browser`.
+
+
 ### 7.0.1 (2019-01-10)
 
 `Browser.get_rows()` fixed.
