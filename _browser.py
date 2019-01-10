@@ -6,7 +6,7 @@ __license__ = 'MIT'
 
 from typing import Union as _Union
 from pytsite import router as _router, metatag as _metatag, lang as _lang, html as _html, events as _events, \
-    routing as _routing
+    routing as _routing, errors as _errors
 from plugins import widget as _widget, auth as _auth, odm as _odm, permissions as _permissions, http_api as _http_api, \
     odm_auth as _odm_auth
 from . import _api
@@ -129,26 +129,15 @@ class Browser:
         # Instantiate finder
         finder = _odm.find(self._model)
 
-        # Admins and developers has full access
-        show_all = self._current_user.is_admin
-
-        # Check if the current user is not admin, but have permission-based full access
-        if not show_all:
-            for perm_prefix in ('odm_auth@modify.', 'odm_auth@delete.'):
-                perm_name = perm_prefix + self._model
-                if _permissions.is_permission_defined(perm_name) and self._current_user.has_permission(perm_name):
-                    show_all = True
-                    break
-
-        # Check if the current user does not have full access, but have access to its own entities
-        if not show_all and (finder.mock.has_field('author') or finder.mock.has_field('owner')):
-            for perm_prefix in ('odm_auth@modify_own.', 'odm_auth@delete_own.'):
-                perm_name = perm_prefix + self._model
-                if _permissions.is_permission_defined(perm_name) and self._current_user.has_permission(perm_name):
-                    if finder.mock.has_field('author'):
-                        finder.eq('author', self._current_user.uid)
-                    elif finder.mock.has_field('owner'):
-                        finder.eq('owner', self._current_user.uid)
+        # Check if the user can modify/delete any entity
+        if not _odm_auth.check_model_permissions(self._model, ['modify', 'delete']):
+            if _odm_auth.check_model_permissions(self._model, ['modify_own', 'delete_own']):
+                # Show entities owned by user
+                for f_name in ['author', 'owner']:
+                    if finder.mock.has_field(f_name):
+                        finder.eq(f_name, self._current_user)
+            else:
+                raise _errors.ForbidOperation("Current user is not allowed to browse '{}' entities".format(self._model))
 
         # Let model to finish finder setup
         _api.dispense_entity(self._model).odm_ui_browser_setup_finder(finder, args)
@@ -221,7 +210,7 @@ class Browser:
                     actions.append(btn)
 
                 if not len(actions.children):
-                    actions.set_attr('css', actions.get_attr('css') + ' empty')
+                    actions.set_attr('css', actions.get_attr('css', '') + ' empty')
 
                 fields_data['entity-actions'] = actions.render()
 

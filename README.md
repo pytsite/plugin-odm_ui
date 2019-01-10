@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 7.0.1 (2019-01-10)
+
+`Browser.get_rows()` fixed.
+
+
 ### 7.0 (2019-01-08)
 
 - New method added: `UIEntity.odm_ui_browser_setup_finder()`.
