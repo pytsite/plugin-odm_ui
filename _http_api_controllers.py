@@ -56,10 +56,12 @@ class PutBrowserRows(_routing.Controller):
         self.args.add_formatter('rows', _formatters.JSONArray())
 
     def exec(self):
+        model = self.arg('model')
+
         for row in self.arg('rows'):
-            e = _odm.get_by_ref(row['ref'])
+            e = _odm.dispense(model, row['__id'])
             e.f_set_multiple({
-                '_parent': row['parent'],
+                '_parent': _odm.dispense(model, row['__parent']) if row['__parent'] else None,
                 'order': row['order'],
             })
             e.save()

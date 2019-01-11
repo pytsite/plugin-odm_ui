@@ -47,7 +47,7 @@ class Browser:
                 'm_form_rule': self._m_form_rule,
                 'd_form_rule': self._d_form_rule,
             }),
-            update_rows_url=_http_api.url('odm_ui@put_browser_rows')
+            update_rows_url=_http_api.url('odm_ui@put_browser_rows', {'model': model})
         )
 
         # Call model's class to perform setup tasks
@@ -172,25 +172,16 @@ class Browser:
 
             # Build row's cells
             fields_data = {
-                '__id': entity.ref,
-                '__parent': entity.parent.ref if entity.parent else None,
+                '__id': str(entity.id),
+                '__parent': str(entity.parent.id) if entity.parent else None,
             }
-            if isinstance(row, (list, tuple)):
-                expected_row_length = len(self.data_fields)
-                if self._model_class.odm_ui_entity_actions_enabled():
-                    expected_row_length -= 1
-                row_length = len(row)
-                if row_length != expected_row_length:
-                    raise ValueError('{}.odm_ui_browser_row() returns invalid number of cells: expected {}, got {}'.
-                                     format(entity.__class__.__name__, expected_row_length, row_length))
-                for f_name, cell_content in zip([df[0] for df in self.data_fields], row):
-                    fields_data[f_name] = cell_content
-            elif isinstance(row, dict):
-                for df in self.data_fields:
-                    fields_data[df[0]] = row.get(df[0], '&nbsp;')
-            else:
-                raise TypeError('{}.odm_ui_browser_row() must return list, tuple or dict, got {}'.
+
+            if not isinstance(row, dict):
+                raise TypeError('{}.odm_ui_browser_row() must return dict, got {}'.
                                 format(entity.__class__.__name__, type(row)))
+
+            for df in self.data_fields:
+                fields_data[df[0]] = row.get(df[0], '&nbsp;')
 
             # Action buttons
             if self._model_class.odm_ui_entity_actions_enabled() and \
@@ -210,9 +201,6 @@ class Browser:
                         btn.add_css('disabled')
                     btn.append(_html.I(css=btn_data.get('icon', 'fa fas fa-fw fa-question')))
                     actions.append(btn)
-
-                if not len(actions.children):
-                    actions.set_attr('css', actions.get_attr('css', '') + ' empty')
 
                 fields_data['entity-actions'] = actions.render()
 

@@ -4,6 +4,12 @@
 ## Changelog
 
 
+### 7.1 (2019-01-11)
+
+- Unnecessary support of lists removed in `Browser.get_rows()` removed.
+- Support of `widget-4.11.1`.
+
+
 ### 7.0.3 (2019-01-10)
 
 Permissions checking fixed in `Browser`.

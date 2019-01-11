@@ -32,7 +32,7 @@ def plugin_load_wsgi():
     # HTTP API handlers
     http_api.handle('GET', 'odm_ui/browser/rows/<model>', _http_api_controllers.GetBrowserRows,
                     'odm_ui@get_browser_rows')
-    http_api.handle('PUT', 'odm_ui/browser/rows', _http_api_controllers.PutBrowserRows,
+    http_api.handle('PUT', 'odm_ui/browser/rows/<model>', _http_api_controllers.PutBrowserRows,
                     'odm_ui@put_browser_rows')
     http_api.handle('GET', 'odm_ui/widget/entity_select', _http_api_controllers.GetWidgetEntitySelect,
                     'odm_ui@widget_entity_select')
