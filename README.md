@@ -4,6 +4,12 @@
 ## Changelog
 
 
+### 7.1.1 (2019-01-16)
+
+Quick and dirty workaround in `EntitySelect` widget to fix linked
+selects management.
+
+
 ### 7.1 (2019-01-11)
 
 - Unnecessary support of lists removed in `Browser.get_rows()` removed.

@@ -104,7 +104,7 @@ class EntitySelect(_widget.select.Select2):
 
         kwargs.setdefault('minimum_input_length', 3)
         kwargs.setdefault('ajax_url', _http_api.url('odm_ui@widget_entity_select'))
-        kwargs.setdefault('linked_select_ajax_query_attr', self._model)
+        kwargs.setdefault('linked_select_ajax_query_attr', self._model[0])
 
         self._limit = kwargs.get('limit', 10)
         self._sort_by = kwargs.get('sort_by')
