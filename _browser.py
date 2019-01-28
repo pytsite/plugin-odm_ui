@@ -132,14 +132,12 @@ class Browser:
         finder = _odm.find(self._model)
 
         # Check if the user can modify/delete any entity
-        if not _odm_auth.check_model_permissions(self._model, ['modify', 'delete']):
-            if _odm_auth.check_model_permissions(self._model, ['modify_own', 'delete_own']):
-                # Show entities owned by user
+        if not _odm_auth.check_model_permissions(self._model, ['modify', 'delete']) and \
+                _odm_auth.check_model_permissions(self._model, ['modify_own', 'delete_own']):
+                # Show only entities owned by user
                 for f_name in ['author', 'owner']:
                     if finder.mock.has_field(f_name):
                         finder.eq(f_name, self._current_user)
-            else:
-                raise _errors.ForbidOperation("Current user is not allowed to browse '{}' entities".format(self._model))
 
         # Let model to finish finder setup
         _api.dispense_entity(self._model).odm_ui_browser_setup_finder(finder, args)

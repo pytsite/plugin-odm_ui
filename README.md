@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 7.1.2 (2019-01-28)
+
+Permissions checking issue fixed.
+
+
 ### 7.1.1 (2019-01-16)
 
 Quick and dirty workaround in `EntitySelect` widget to fix linked
