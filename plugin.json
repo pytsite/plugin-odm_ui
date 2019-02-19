@@ -1,6 +1,6 @@
 {
   "name": "odm_ui",
-  "version": "7.1.2",
+  "version": "7.1.3",
   "description": {
     "en": "Object Document Mapper UI",
     "ru": "Object Document Mapper UI",
@@ -13,21 +13,21 @@
     "url": "https://shepetko.com"
   },
   "requires": {
-    "pytsite": ">=8.6",
+    "pytsite": ">=8.9",
     "packages": {
       "pyuca": "1.x"
     },
     "plugins": {
-      "admin": "2.x",
-      "assetman": "5.x",
-      "auth": "3.x",
-      "auth_ui": "4.x",
-      "form": "5.x",
-      "http_api": "3.x",
-      "odm": ">=5.7<6",
-      "odm_auth": "3.x",
-      "odm_http_api": "5.x",
-      "widget": ">=4.11.1<5"
+      "admin": "^2.0",
+      "assetman": "^5.0",
+      "auth": "^3.0",
+      "auth_ui": "^4.0",
+      "form": "^5.0",
+      "http_api": "^3.0",
+      "odm": "^5.7",
+      "odm_auth": "^3.0",
+      "odm_http_api": "^5.0",
+      "widget": "^4.11.1"
     }
   }
 }

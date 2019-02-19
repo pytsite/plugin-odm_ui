@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 7.1.3 (2019-02-19)
+
+Modify form cancel button href setting fixed.
+
+
 ### 7.1.2 (2019-01-28)
 
 Permissions checking issue fixed.

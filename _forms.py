@@ -89,7 +89,9 @@ class Modify(_form.Form):
         # Cancel button URL
         cancel_href = self.redirect
         if not cancel_href or cancel_href == 'ENTITY_VIEW':
-            if not entity.is_new and entity.odm_ui_view_url():
+            if self.referer != _router.current_url():
+                cancel_href = self.referer
+            elif not entity.is_new and entity.odm_ui_view_url():
                 cancel_href = entity.odm_ui_view_url()
             else:
                 cancel_href = _router.base_url()
@@ -100,7 +102,7 @@ class Modify(_form.Form):
             weight=150,
             value=_lang.t('odm_ui@cancel'),
             icon='fa fas fa-fw fa-remove fa-times',
-            href=self.referer or self.redirect or _router.base_url(),
+            href=cancel_href,
             form_area='footer',
         ))
 
