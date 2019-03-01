@@ -89,7 +89,7 @@ class Modify(_form.Form):
         # Cancel button URL
         cancel_href = self.redirect
         if not cancel_href or cancel_href == 'ENTITY_VIEW':
-            if self.referer != self.location:
+            if self.referer != self.location and self.referer:
                 cancel_href = self.referer
             elif not entity.is_new and entity.odm_ui_view_url():
                 cancel_href = entity.odm_ui_view_url()
