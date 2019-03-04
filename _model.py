@@ -169,7 +169,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
                     uid=uid,
                     weight=weight,
                     label=self.t(uid),
-                    required=field.required,
+                    required=field.is_required,
                     default=field.default,
                     value=field.get_val(),
                 ))
@@ -178,7 +178,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
                     uid=uid,
                     weight=weight,
                     label=self.t(uid),
-                    required=field.required,
+                    required=field.is_required,
                     default=field.default,
                     value=field.get_val(),
                 ))
@@ -187,7 +187,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
                     uid=uid,
                     weight=weight,
                     label=self.t(uid),
-                    required=field.required,
+                    required=field.is_required,
                     default=field.default,
                     value=field.get_val(),
                 ))
@@ -196,7 +196,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
                     uid=uid,
                     weight=weight,
                     label=self.t(uid),
-                    required=field.required,
+                    required=field.is_required,
                     default=field.default,
                     value=field.get_val(),
                 ))
@@ -205,7 +205,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
                     uid=uid,
                     weight=weight,
                     label=self.t(uid),
-                    required=field.required,
+                    required=field.is_required,
                     default=field.default,
                     value=field.get_val(),
                 ))
@@ -214,7 +214,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
                     uid=uid,
                     weight=weight,
                     label=self.t(uid),
-                    required=field.required,
+                    required=field.is_required,
                     items=[(x, self.t(x)) for x in field.values],
                     default=field.default,
                     value=field.get_val(),

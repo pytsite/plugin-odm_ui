@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 7.2 (2019-03-04)
+
+Support of `odm-6.0`.
+
+
 ### 7.1.5 (2019-03-01)
 
 Form's button URL fixed.
