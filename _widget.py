@@ -4,7 +4,7 @@ __author__ = 'Oleksandr Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
-from typing import List as _List, Callable as _Callable, Union as _Union, Iterable as _Iterable, Tuple as _Tuple
+from typing import List as _List, Callable as _Callable, Union as _Union, Iterable as _Iterable
 from pyuca import Collator as _Collator
 from json import dumps as _json_dumps
 from pytsite import lang as _lang, html as _html
@@ -168,7 +168,7 @@ class EntityCheckboxes(_widget.select.Checkboxes):
     """
 
     def __init__(self, uid: str, **kwargs):
-        """Init.
+        """Init
         """
         self._model = kwargs.get('model')
         if not self._model:
@@ -287,24 +287,22 @@ class EntityCheckboxes(_widget.select.Checkboxes):
 
         return entities
 
-    def _get_items(self) -> _List[_Tuple[str, str]]:
-        r = []
+    def _default_item_renderer(self, e: _odm.Entity):
+        caption = self._caption_field(e) if callable(self._caption_field) else e.get_field(self._caption_field)
+        if self._translate_captions:
+            caption = _lang.t(caption)
 
-        for e in self._get_entities():
-            caption = self._caption_field(e) if callable(self._caption_field) else e.get_field(self._caption_field)
-            if self._translate_captions:
-                caption = _lang.t(caption)
-
-            r.append((str(e), str(caption)))
-
-        return r
+        return super()._default_item_renderer((e.ref, caption))
 
     def _get_element(self, **kwargs):
         """Hook
         """
-        self._items = self._get_items()
+        container = _html.TagLessElement()
+        container.append(_html.Input(type='hidden', name=self.name))  # It is important to have an empty input!
+        for entity in self._get_entities():
+            container.append(self._item_renderer(entity))
 
-        return super()._get_element()
+        return container
 
 
 class EntitySlots(_widget.Abstract):
