@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 7.2.2 (2019-03-06)
+
+Cleanup.
+
+
 ### 7.2.1 (2019-03-06)
 
 Little refactoring of `widget.EntityCheckboxes`.

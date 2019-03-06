@@ -307,32 +307,6 @@ class EntityCheckboxes(_widget.select.Checkboxes):
         return super()._get_element()
 
 
-class EntityCheckboxes2(EntityCheckboxes):
-    @property
-    def item_tpl(self) -> _html.Element:
-        return self._item_tpl
-
-    @item_tpl.setter
-    def item_tpl(self, value: _html.Element):
-        self._item_tpl = value
-
-    def __init__(self, uid: str, **kwargs):
-        super().__init__(uid)
-
-        self._item_tpl = kwargs.get('item_tpl', _html.Div('{CAPTION}', css='item'))  # type: _html.Element
-        if not self._item_tpl:
-            raise ValueError('item_tpl is required')
-
-    def _get_element(self, **kwargs) -> _html.Element:
-        """Hook
-        """
-        root = _html.TagLessElement()
-
-        self._items = self._get_items()
-
-        return root
-
-
 class EntitySlots(_widget.Abstract):
     @property
     def ignore_missing_entities(self) -> bool:
