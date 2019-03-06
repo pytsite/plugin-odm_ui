@@ -4,7 +4,7 @@ __author__ = 'Oleksandr Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
-from typing import List as _List, Callable as _Callable, Union as _Union, Iterable as _Iterable
+from typing import List as _List, Callable as _Callable, Union as _Union, Iterable as _Iterable, Tuple as _Tuple
 from pyuca import Collator as _Collator
 from json import dumps as _json_dumps
 from pytsite import lang as _lang, html as _html
@@ -164,7 +164,7 @@ class EntitySelect(_widget.select.Select2):
 
 
 class EntityCheckboxes(_widget.select.Checkboxes):
-    """Select Entities with Checkboxes Widget.
+    """Select Entities with Checkboxes Widget
     """
 
     def __init__(self, uid: str, **kwargs):
@@ -263,7 +263,7 @@ class EntityCheckboxes(_widget.select.Checkboxes):
 
         return super().set_val(clean_val)
 
-    def _get_element(self, **kwargs):
+    def _get_finder(self) -> _odm.Finder:
         f = _odm.find(self._model)
 
         if self._sort_field:
@@ -272,8 +272,11 @@ class EntityCheckboxes(_widget.select.Checkboxes):
         if self._finder_adjust:
             self._finder_adjust(f)
 
+        return f
+
+    def _get_entities(self) -> _List[_odm.Entity]:
         entities = []
-        for e in f:
+        for e in self._get_finder():
             if str(e) not in self._exclude:
                 entities.append(e)
 
@@ -282,14 +285,52 @@ class EntityCheckboxes(_widget.select.Checkboxes):
             rev = True if self._sort_order == _odm.I_DESC else False
             entities = sorted(entities, key=lambda ent: _pyuca_col.sort_key(ent.f_get(self._sort_field)), reverse=rev)
 
-        for e in entities:
+        return entities
+
+    def _get_items(self) -> _List[_Tuple[str, str]]:
+        r = []
+
+        for e in self._get_entities():
             caption = self._caption_field(e) if callable(self._caption_field) else e.get_field(self._caption_field)
             if self._translate_captions:
                 caption = _lang.t(caption)
 
-            self._items.append((str(e), str(caption)))
+            r.append((str(e), str(caption)))
+
+        return r
+
+    def _get_element(self, **kwargs):
+        """Hook
+        """
+        self._items = self._get_items()
 
         return super()._get_element()
+
+
+class EntityCheckboxes2(EntityCheckboxes):
+    @property
+    def item_tpl(self) -> _html.Element:
+        return self._item_tpl
+
+    @item_tpl.setter
+    def item_tpl(self, value: _html.Element):
+        self._item_tpl = value
+
+    def __init__(self, uid: str, **kwargs):
+        super().__init__(uid)
+
+        self._item_tpl = kwargs.get('item_tpl', _html.Div('{CAPTION}', css='item'))  # type: _html.Element
+        if not self._item_tpl:
+            raise ValueError('item_tpl is required')
+
+    def _get_element(self, **kwargs) -> _html.Element:
+        """Hook
+        """
+        root = _html.TagLessElement()
+
+        self._items = self._get_items()
+
+        return root
 
 
 class EntitySlots(_widget.Abstract):
