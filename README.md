@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 7.2.4 (2019-03-06)
+
+Error in `widget.EntityCheckboxes._default_item_renderer()` fixed.
+
+
 ### 7.2.3 (2019-03-06)
 
 Little refactoring of `widget.EntityCheckboxes`.

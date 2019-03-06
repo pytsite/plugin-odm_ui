@@ -288,7 +288,7 @@ class EntityCheckboxes(_widget.select.Checkboxes):
         return entities
 
     def _default_item_renderer(self, e: _odm.Entity):
-        caption = self._caption_field(e) if callable(self._caption_field) else e.get_field(self._caption_field)
+        caption = self._caption_field(e) if callable(self._caption_field) else e.f_get(self._caption_field)
         if self._translate_captions:
             caption = _lang.t(caption)
 
