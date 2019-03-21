@@ -4,7 +4,7 @@ __author__ = 'Oleksandr Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
-from typing import List as _List, Callable as _Callable, Union as _Union, Iterable as _Iterable
+from typing import List as _List, Callable as _Callable, Union as _Union, Iterable as _Iterable, Tuple as _Tuple
 from pyuca import Collator as _Collator
 from json import dumps as _json_dumps
 from pytsite import lang as _lang, html as _html
@@ -45,11 +45,16 @@ class EntitySelect(_widget.select.Select2):
     """
 
     @property
-    def model(self) -> _List[str]:
+    def model(self) -> _Tuple[str, ...]:
         return self._model
 
     @model.setter
-    def model(self, value: _List[str]):
+    def model(self, value: _Union[str, _Tuple[str, ...]]):
+        if isinstance(value, str):
+            value = (value,)
+        elif not isinstance(value, tuple):
+            value = tuple(value)
+
         self._model = value
 
     @property
@@ -97,8 +102,10 @@ class EntitySelect(_widget.select.Select2):
         if not self._model:
             raise ValueError('Model is not specified')
 
-        if not isinstance(self._model, list):
-            self._model = [self._model]
+        if isinstance(self._model, str):
+            self._model = (self._model,)
+        elif not isinstance(self._model, tuple):
+            self._model = tuple(self._model)
 
         _sanitize_kwargs_exclude(kwargs)
 

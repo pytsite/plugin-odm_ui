@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 7.2.5 (2019-03-21)
+
+Type checking of `widget.EntitySelect.model` property fixed.
+
+
 ### 7.2.4 (2019-03-06)
 
 Error in `widget.EntityCheckboxes._default_item_renderer()` fixed.
