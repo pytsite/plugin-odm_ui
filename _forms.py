@@ -86,6 +86,13 @@ class Modify(_form.Form):
                 form_area='hidden',
             ))
 
+            # Entity ref
+            self.add_widget(_widget.input.Hidden(
+                uid='ref',
+                value=entity.ref if not entity.is_new else None,
+                form_area='hidden',
+            ))
+
         # Cancel button URL
         cancel_href = self.redirect
         if not cancel_href or cancel_href == 'ENTITY_VIEW':

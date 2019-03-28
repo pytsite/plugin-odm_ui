@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 7.3 (2019-03-28)
+
+New hidden field `ref` added to the `Modify` form.
+
+
 ### 7.2.5 (2019-03-21)
 
 Type checking of `widget.EntitySelect.model` property fixed.
