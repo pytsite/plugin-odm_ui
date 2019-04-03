@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 7.3.1 (2019-04-03)
+
+Invalid variable usage fixed in `Browser`.
+
+
 ### 7.3 (2019-03-28)
 
 New hidden field `ref` added to the `Modify` form.
