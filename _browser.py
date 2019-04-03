@@ -22,7 +22,7 @@ class Browser:
             raise RuntimeError('No model specified')
 
         if not _odm_auth.check_model_permissions(model, ['create', 'modify', 'modify_own', 'delete', 'delete_own']):
-            raise _errors.ForbidOperation("Current user is not allowed to browse '{}' entities".format(self._model))
+            raise _errors.ForbidOperation("Current user is not allowed to browse '{}' entities".format(model))
 
         # Model
         self._model = model
