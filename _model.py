@@ -135,10 +135,11 @@ class UIEntity(_odm_auth.model.OwnedEntity):
         if args is None:
             args = {}
 
+        args.setdefault('__redirect', 'ENTITY_VIEW')
+
         args.update({
             'model': self.model,
-            'eid': str(self.id),
-            '__redirect': 'ENTITY_VIEW',
+            'eid': '0' if self.is_new else str(self.id),
         })
 
         return _router.rule_url(self.odm_ui_m_form_rule(), args, **kwargs)

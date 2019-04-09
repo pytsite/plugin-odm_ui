@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 7.3.2 (2019-04-09)
+
+`__redirect` arg usage fixed in `odm_ui_m_form_url()`.
+
+
 ### 7.3.1 (2019-04-03)
 
 Invalid variable usage fixed in `Browser`.
