@@ -35,7 +35,7 @@ class ModifyForm(_routing.Controller):
 class DeleteForm(_routing.Controller):
     def exec(self) -> str:
         model = self.arg('model')
-        eids = self.arg('ids', [])
+        eids = self.arg('ids', []) or self.arg('eids', [])
 
         # No required arguments has been received
         if not model or not eids:

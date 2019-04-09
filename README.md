@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 7.3.3 (2019-04-09)
+
+Argument processing fixed in `DeleteForm` controller.
+
+
 ### 7.3.2 (2019-04-09)
 
 `__redirect` arg usage fixed in `odm_ui_m_form_url()`.
