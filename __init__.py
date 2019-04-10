@@ -18,15 +18,20 @@ def plugin_load_wsgi():
 
     abp = admin.base_path()
 
-    # Route: ODM browser page
+    # Browse route
     router.handle(_controllers.Browse, abp + '/odm_ui/<model>', 'odm_ui@admin_browse', filters=auth_ui.AuthFilter)
+    router.handle(_controllers.Browse, 'odm_ui/<model>', 'odm_ui@browse', filters=auth_ui.AuthFilter)
 
-    # Route: 'create/modify' ODM entity form display
-    router.handle(_controllers.ModifyForm, abp + '/odm_ui/<model>/modify/<eid>', 'odm_ui@admin_m_form',
+    # Create/modify form routes
+    router.handle(_controllers.Form, abp + '/odm_ui/<model>/modify/<eid>', 'odm_ui@admin_m_form',
+                  filters=auth_ui.AuthFilter)
+    router.handle(_controllers.Form, 'odm_ui/<model>/modify/<eid>', 'odm_ui@m_form',
                   filters=auth_ui.AuthFilter)
 
-    # Route: 'delete' form display
-    router.handle(_controllers.DeleteForm, abp + '/odm_ui/<model>/delete', 'odm_ui@admin_d_form',
+    # Delete form route
+    router.handle(_controllers.Form, abp + '/odm_ui/<model>/delete', 'odm_ui@admin_d_form',
+                  methods=('GET', 'POST'), filters=auth_ui.AuthFilter)
+    router.handle(_controllers.Form, 'odm_ui/<model>/delete', 'odm_ui@d_form',
                   methods=('GET', 'POST'), filters=auth_ui.AuthFilter)
 
     # HTTP API handlers

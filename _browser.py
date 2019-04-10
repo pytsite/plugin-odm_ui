@@ -5,8 +5,8 @@ __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
 from typing import Union as _Union
-from pytsite import router as _router, metatag as _metatag, lang as _lang, html as _html, events as _events, \
-    routing as _routing, errors as _errors
+from pytsite import router as _router, lang as _lang, html as _html, events as _events, routing as _routing, \
+    errors as _errors
 from plugins import widget as _widget, auth as _auth, odm as _odm, http_api as _http_api, odm_auth as _odm_auth
 from . import _api
 
@@ -65,14 +65,17 @@ class Browser:
                 (self._model_class.odm_ui_modification_allowed() or self._model_class.odm_ui_deletion_allowed()):
             self.insert_data_field('entity-actions', 'odm_ui@actions', False)
 
-        # Metatags
-        _metatag.t_set('title', self._model_class.t('odm_ui_browser_title_' + self._model))
-
     @property
     def model(self) -> str:
         """Get browser entities model
         """
         return self._model
+
+    @property
+    def title(self) -> str:
+        """Get browser's title
+        """
+        return self._model_class.t('odm_ui_browser_title_' + self._model)
 
     @property
     def browse_rule(self) -> str:
@@ -134,10 +137,10 @@ class Browser:
         # Check if the user can modify/delete any entity
         if not _odm_auth.check_model_permissions(self._model, ['modify', 'delete']) and \
                 _odm_auth.check_model_permissions(self._model, ['modify_own', 'delete_own']):
-                # Show only entities owned by user
-                for f_name in ['author', 'owner']:
-                    if finder.mock.has_field(f_name):
-                        finder.eq(f_name, self._current_user)
+            # Show only entities owned by user
+            for f_name in ['author', 'owner']:
+                if finder.mock.has_field(f_name):
+                    finder.eq(f_name, self._current_user)
 
         # Let model to finish finder setup
         _api.dispense_entity(self._model).odm_ui_browser_setup_finder(finder, args)

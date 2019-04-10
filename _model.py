@@ -4,14 +4,28 @@ __author__ = 'Oleksandr Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
-from typing import Tuple as _Tuple, Dict as _Dict, Type as _Type, List as _List, Union as _Union
+from typing import Tuple as _Tuple, Dict as _Dict, Type as _Type, List as _List, Union as _Union, Optional as _Optional
 from pytsite import router as _router, lang as _lang, routing as _routing
-from plugins import widget as _widget, odm as _odm, odm_auth as _odm_auth, form as _form
+from plugins import widget as _widget, odm as _odm, odm_auth as _odm_auth, form as _form, admin as _admin
+
+_ADM_BP = _admin.base_path()
 
 
 class UIEntity(_odm_auth.model.OwnedEntity):
     """ODM entity with UI related methods.
     """
+
+    @classmethod
+    def _get_rule(cls, rule_type: str) -> _Optional[str]:
+        path = _router.current_path()
+
+        ref = _router.request().referrer
+        ref_path = _router.url(ref, add_lang_prefix=False, as_list=True)[2] if ref else ''
+
+        if path.startswith(_ADM_BP) or ref_path.startswith(_ADM_BP):
+            rule_type = 'admin_' + rule_type
+
+        return 'odm_ui@' + rule_type
 
     @classmethod
     def odm_ui_browser_widget_class(cls) -> _Type[_widget.misc.DataTable]:
@@ -109,7 +123,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
     def odm_ui_browse_rule(cls) -> str:
         """Get browse router's rule name
         """
-        return 'odm_ui@admin_browse'
+        return cls._get_rule('browse')
 
     def odm_ui_browse_url(self, args: dict = None, **kwargs):
         """Get browse URL
@@ -127,7 +141,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
     def odm_ui_m_form_rule(cls) -> str:
         """Get modify form router's rule name
         """
-        return 'odm_ui@admin_m_form'
+        return cls._get_rule('m_form')
 
     def odm_ui_m_form_url(self, args: dict = None, **kwargs):
         """Get modify form URL
@@ -240,7 +254,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
 
     @classmethod
     def odm_ui_d_form_rule(cls) -> str:
-        return 'odm_ui@admin_d_form'
+        return cls._get_rule('d_form')
 
     def odm_ui_d_form_url(self, args: dict = None, **kwargs) -> str:
         if args is None:

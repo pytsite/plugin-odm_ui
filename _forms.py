@@ -5,7 +5,7 @@ __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
 from pytsite import lang as _lang, http as _http, events as _events, router as _router, html as _html, \
-    logger as _logger, errors as _errors, metatag as _metatag
+    logger as _logger, errors as _errors
 from plugins import widget as _widget, form as _form, odm as _odm, odm_auth as _odm_auth
 from . import _model
 
@@ -56,9 +56,6 @@ class Modify(_form.Form):
 
         # CSS
         self.css += ' odm-ui-form odm-ui-m-form odm-ui-form-' + model
-
-        # Meta title
-        _metatag.t_set('title', self.title)
 
     def _on_setup_widgets(self):
         from ._api import dispense_entity
@@ -215,9 +212,6 @@ class Delete(MassAction):
 
         # Form CSS
         self.css += ' odm-ui-mass-d-form'
-
-        # Meta title
-        _metatag.t_set('title', self.title)
 
     def _on_setup_widgets(self):
         """Hook.

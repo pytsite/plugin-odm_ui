@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 7.4 (2019-04-10)
+
+Routes names and controllers refactored.
+
+
 ### 7.3.3 (2019-04-09)
 
 Argument processing fixed in `DeleteForm` controller.

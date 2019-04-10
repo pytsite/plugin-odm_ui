@@ -4,44 +4,75 @@ __author__ = 'Oleksandr Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
-from pytsite import tpl as _tpl, router as _router, routing as _routing, errors as _errors
+from pytsite import tpl as _tpl, router as _router, routing as _routing, errors as _errors, metatag as _metatag
 from plugins import admin as _admin
 from . import _api
 
 
 class Browse(_routing.Controller):
-    """Entities browser
+    """Entities Browser
     """
 
     def exec(self) -> str:
-        return _admin.render(_tpl.render('odm_ui@browse', {
-            'browser': _api.get_browser(self.arg('model'))
-        }))
+        # Get browser
+        browser = _api.get_browser(self.arg('model'))
 
+        # Set page title
+        _metatag.t_set('title', browser.title)
 
-class ModifyForm(_routing.Controller):
-    def exec(self) -> str:
-        """Get entity create/modify form.
-        """
-        try:
-            eid = self.arg('eid')
-            form = _api.get_m_form(self.arg('model'), eid if eid != '0' else None, hide_title=True)
-            return _admin.render(_tpl.render('odm_ui@form', {'form': form}))
+        # Render admin template
+        if self.arg('_pytsite_router_rule_name') == 'odm_ui@admin_browse':
+            return _admin.render(_tpl.render('odm_ui@browse', {'browser': browser}))
 
-        except _errors.NotFound as e:
-            raise self.not_found(e)
+        # Render user template
+        elif self.arg('_pytsite_router_rule_name') == 'odm_ui@browse':
+            try:
+                # Call a controller provided by application
+                return _router.call('odm_ui_browse', {'browser': browser})
 
+            except _routing.error.RuleNotFound:
+                # Render a template provided by application
+                return _tpl.render('odm_ui/browse', {'browser': browser})
 
-class DeleteForm(_routing.Controller):
-    def exec(self) -> str:
-        model = self.arg('model')
-        eids = self.arg('ids', []) or self.arg('eids', [])
-
-        # No required arguments has been received
-        if not model or not eids:
+        # Unknown rule
+        else:
             raise self.not_found()
 
-        redirect = _router.rule_url('odm_ui@admin_browse', {'model': self.arg('model')})
-        form = _api.get_d_form(model, eids, redirect=redirect, hide_title=True)
 
-        return _admin.render(_tpl.render('odm_ui@form', {'form': form}))
+class Form(_routing.Controller):
+    """Entity Form
+    """
+
+    def exec(self) -> str:
+        rule_name = self.arg('_pytsite_router_rule_name')  # type: str
+        model = self.arg('model')
+
+        # Get form
+        if rule_name.endswith('m_form'):
+            try:
+                eid = self.arg('eid')
+                form = _api.get_m_form(model, eid if eid != '0' else None, hide_title=True)
+                _metatag.t_set('title', form.title)
+            except _errors.NotFound as e:
+                raise self.not_found(e)
+        elif rule_name.endswith('d_form'):
+            eids = self.arg('ids', []) or self.arg('eids', [])
+            form = _api.get_d_form(model, eids, hide_title=True)
+        else:
+            raise self.not_found()
+
+        _metatag.t_set('title', form.title)
+
+        # Render admin template
+        if 'admin' in rule_name:
+            return _admin.render(_tpl.render('odm_ui@form', {'form': form}))
+
+        # Render user template
+        else:
+            try:
+                # Call a controller provided by application
+                return _router.call('odm_ui_form', {'form': form})
+
+            except _routing.error.RuleNotFound:
+                # Render a template provided by application
+                return _tpl.render('odm_ui/form', {'form': form})
