@@ -28,7 +28,8 @@ class Browse(_routing.Controller):
         elif self.arg('_pytsite_router_rule_name') == 'odm_ui@browse':
             try:
                 # Call a controller provided by application
-                return _router.call('odm_ui_browse', {'browser': browser})
+                self.args['browser'] = browser
+                return _router.call('odm_ui_browse', self.args)
 
             except _routing.error.RuleNotFound:
                 # Render a template provided by application
@@ -71,7 +72,8 @@ class Form(_routing.Controller):
         else:
             try:
                 # Call a controller provided by application
-                return _router.call('odm_ui_form', {'form': form})
+                self.args['form'] = form
+                return _router.call('odm_ui_form', self.args)
 
             except _routing.error.RuleNotFound:
                 # Render a template provided by application

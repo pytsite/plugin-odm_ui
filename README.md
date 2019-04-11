@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 7.4.1 (2019-04-11)
+
+Arguments passing fixed in controllers.
+
+
 ### 7.4 (2019-04-10)
 
 Routes names and controllers refactored.
