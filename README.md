@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 7.5 (2019-05-27)
+
+Support of `odm_auth-3.2`.
+
+
 ### 7.4.1 (2019-04-11)
 
 Arguments passing fixed in controllers.

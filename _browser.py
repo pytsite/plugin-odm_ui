@@ -8,6 +8,7 @@ from typing import Union as _Union
 from pytsite import router as _router, lang as _lang, html as _html, events as _events, routing as _routing, \
     errors as _errors
 from plugins import widget as _widget, auth as _auth, odm as _odm, http_api as _http_api, odm_auth as _odm_auth
+from plugins.odm_auth import PERM_CREATE, PERM_MODIFY, PERM_DELETE, PERM_MODIFY_OWN, PERM_DELETE_OWN
 from . import _api
 
 
@@ -21,7 +22,8 @@ class Browser:
         if not model:
             raise RuntimeError('No model specified')
 
-        if not _odm_auth.check_model_permissions(model, ['create', 'modify', 'modify_own', 'delete', 'delete_own']):
+        if not _odm_auth.check_model_permissions(model, [PERM_CREATE, PERM_MODIFY, PERM_DELETE,
+                                                         PERM_MODIFY_OWN, PERM_DELETE_OWN]):
             raise _errors.ForbidOperation("Current user is not allowed to browse '{}' entities".format(model))
 
         # Model
@@ -135,8 +137,8 @@ class Browser:
         finder = _odm.find(self._model)
 
         # Check if the user can modify/delete any entity
-        if not _odm_auth.check_model_permissions(self._model, ['modify', 'delete']) and \
-                _odm_auth.check_model_permissions(self._model, ['modify_own', 'delete_own']):
+        if not _odm_auth.check_model_permissions(self._model, [PERM_MODIFY, PERM_DELETE]) and \
+                _odm_auth.check_model_permissions(self._model, [PERM_MODIFY_OWN, PERM_DELETE_OWN]):
             # Show only entities owned by user
             for f_name in ['author', 'owner']:
                 if finder.mock.has_field(f_name):
@@ -211,7 +213,7 @@ class Browser:
 
     def render(self) -> str:
         # 'Create' toolbar button
-        if self._model_class.odm_ui_creation_allowed() and _odm_auth.check_model_permissions(self._model, 'create'):
+        if self._model_class.odm_ui_creation_allowed() and _odm_auth.check_model_permissions(self._model, PERM_CREATE):
             create_form_url = _router.rule_url(self._m_form_rule, {
                 'model': self._model,
                 'eid': 0,

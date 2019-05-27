@@ -7,6 +7,7 @@ __license__ = 'MIT'
 from typing import Tuple as _Tuple, Dict as _Dict, Type as _Type, List as _List, Union as _Union, Optional as _Optional
 from pytsite import router as _router, lang as _lang, routing as _routing
 from plugins import widget as _widget, odm as _odm, odm_auth as _odm_auth, form as _form, admin as _admin
+from plugins.odm_auth import PERM_MODIFY, PERM_DELETE
 
 _ADM_BP = _admin.base_path()
 
@@ -88,7 +89,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
         """
         r = []
 
-        if self.odm_ui_modification_allowed() and self.odm_auth_check_entity_permissions('modify'):
+        if self.odm_ui_modification_allowed() and self.odm_auth_check_entity_permissions(PERM_MODIFY):
             r.append({
                 'url': _router.rule_url(browser.m_form_rule, {
                     'model': self.model,
@@ -99,7 +100,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
                 'icon': 'fa fas fa-fw fa-fw fa-edit',
             })
 
-        if self.odm_ui_deletion_allowed() and self.odm_auth_check_entity_permissions('delete'):
+        if self.odm_ui_deletion_allowed() and self.odm_auth_check_entity_permissions(PERM_DELETE):
             r.append({
                 'url': _router.rule_url(browser.d_form_rule, {
                     'model': self.model,

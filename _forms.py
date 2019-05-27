@@ -7,6 +7,7 @@ __license__ = 'MIT'
 from pytsite import lang as _lang, http as _http, events as _events, router as _router, html as _html, \
     logger as _logger, errors as _errors
 from plugins import widget as _widget, form as _form, odm as _odm, odm_auth as _odm_auth
+from plugins.odm_auth import PERM_CREATE, PERM_MODIFY, PERM_DELETE
 from . import _model
 
 
@@ -29,7 +30,7 @@ class Modify(_form.Form):
 
         if entity.is_new:
             # Check if entities of this model can be created
-            perms_allow = entity.odm_auth_check_entity_permissions('create')
+            perms_allow = entity.odm_auth_check_entity_permissions(PERM_CREATE)
             odm_ui_allows = entity.odm_ui_creation_allowed()
             if not (perms_allow and odm_ui_allows):
                 raise _http.error.Forbidden()
@@ -38,7 +39,7 @@ class Modify(_form.Form):
             self.title = entity.t('odm_ui_form_title_create_' + model)
         else:
             # Check if the entity can be modified
-            perms_allow = entity.odm_auth_check_entity_permissions('modify')
+            perms_allow = entity.odm_auth_check_entity_permissions(PERM_MODIFY)
             odm_ui_allows = entity.odm_ui_modification_allowed()
             if not (perms_allow and odm_ui_allows):
                 raise _http.error.Forbidden()
@@ -203,7 +204,7 @@ class Delete(MassAction):
         # Check permissions
         for eid in self.attr('eids', self.attr('ids', [])):
             e = _odm.dispense(model, eid)  # type: _odm_auth.OwnedEntity
-            if not e.odm_auth_check_entity_permissions('delete'):
+            if not e.odm_auth_check_entity_permissions(PERM_DELETE):
                 raise _http.error.Forbidden()
 
         # Form title
