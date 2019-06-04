@@ -4,24 +4,24 @@ __author__ = 'Oleksandr Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
-from typing import Tuple as _Tuple, Dict as _Dict, Type as _Type, List as _List, Union as _Union, Optional as _Optional
-from pytsite import router as _router, lang as _lang, routing as _routing
-from plugins import widget as _widget, odm as _odm, odm_auth as _odm_auth, form as _form, admin as _admin
+from typing import Tuple, Dict, Type, List, Union, Optional
+from pytsite import router, lang, routing
+from plugins import widget, odm, odm_auth, form, admin
 from plugins.odm_auth import PERM_MODIFY, PERM_DELETE
 
-_ADM_BP = _admin.base_path()
+_ADM_BP = admin.base_path()
 
 
-class UIEntity(_odm_auth.model.OwnedEntity):
+class UIEntity(odm_auth.OwnedEntity):
     """ODM entity with UI related methods.
     """
 
     @classmethod
-    def _get_rule(cls, rule_type: str) -> _Optional[str]:
-        path = _router.current_path()
+    def _get_rule(cls, rule_type: str) -> Optional[str]:
+        path = router.current_path()
 
-        ref = _router.request().referrer
-        ref_path = _router.url(ref, add_lang_prefix=False, as_list=True)[2] if ref else ''
+        ref = router.request().referrer
+        ref_path = router.url(ref, add_lang_prefix=False, as_list=True)[2] if ref else ''
 
         if path.startswith(_ADM_BP) or ref_path.startswith(_ADM_BP):
             rule_type = 'admin_' + rule_type
@@ -29,8 +29,8 @@ class UIEntity(_odm_auth.model.OwnedEntity):
         return 'odm_ui@' + rule_type
 
     @classmethod
-    def odm_ui_browser_widget_class(cls) -> _Type[_widget.misc.DataTable]:
-        return _widget.misc.BootstrapTable
+    def odm_ui_browser_widget_class(cls) -> Type[widget.misc.DataTable]:
+        return widget.misc.BootstrapTable
 
     def odm_ui_browser_setup(self, browser):
         """Setup ODM UI browser hook.
@@ -39,23 +39,23 @@ class UIEntity(_odm_auth.model.OwnedEntity):
         """
         pass
 
-    def odm_ui_browser_setup_finder(self, finder: _odm.SingleModelFinder, args: _routing.ControllerArgs):
+    def odm_ui_browser_setup_finder(self, finder: odm.SingleModelFinder, args: routing.ControllerArgs):
         search_query = args.get('search')
         if search_query:
             if self.has_text_index:
                 finder.text(search_query)
             else:
                 for name, field in self.fields.items():
-                    if isinstance(field, _odm.field.String):
+                    if isinstance(field, odm.field.String):
                         finder.or_regex(name, search_query, True)
 
-    def odm_ui_browser_row(self) -> _Union[tuple, list, dict]:
+    def odm_ui_browser_row(self) -> Union[tuple, list, dict]:
         """Get single UI browser row.
         """
         return ()
 
     @classmethod
-    def odm_ui_browser_mass_action_buttons(cls) -> _Tuple[_Dict, ...]:
+    def odm_ui_browser_mass_action_buttons(cls) -> Tuple[Dict, ...]:
         """Get toolbar mass actions buttons data.
         """
         return ()
@@ -84,30 +84,30 @@ class UIEntity(_odm_auth.model.OwnedEntity):
         """
         return True
 
-    def odm_ui_browser_entity_actions(self, browser) -> _List[_Dict]:
+    def odm_ui_browser_entity_actions(self, browser) -> List[Dict]:
         """Get actions buttons data for single data row.
         """
         r = []
 
         if self.odm_ui_modification_allowed() and self.odm_auth_check_entity_permissions(PERM_MODIFY):
             r.append({
-                'url': _router.rule_url(browser.m_form_rule, {
+                'url': router.rule_url(browser.m_form_rule, {
                     'model': self.model,
                     'eid': str(self.id),
-                    '__redirect': _router.rule_url(browser.browse_rule, {'model': self.model}),
+                    '__redirect': router.rule_url(browser.browse_rule, {'model': self.model}),
                 }),
-                'title': _lang.t('odm_ui@modify'),
+                'title': lang.t('odm_ui@modify'),
                 'icon': 'fa fas fa-fw fa-fw fa-edit',
             })
 
         if self.odm_ui_deletion_allowed() and self.odm_auth_check_entity_permissions(PERM_DELETE):
             r.append({
-                'url': _router.rule_url(browser.d_form_rule, {
+                'url': router.rule_url(browser.d_form_rule, {
                     'model': self.model,
                     'ids': str(self.id),
-                    '__redirect': _router.rule_url(browser.browse_rule, {'model': self.model}),
+                    '__redirect': router.rule_url(browser.browse_rule, {'model': self.model}),
                 }),
-                'title': _lang.t('odm_ui@delete'),
+                'title': lang.t('odm_ui@delete'),
                 'icon': 'fa fas fa-fw fa-fw fa-remove fa-times',
                 'color': 'danger',
             })
@@ -136,7 +136,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
             'model': self.model
         })
 
-        return _router.rule_url(self.odm_ui_browse_rule(), args, **kwargs)
+        return router.rule_url(self.odm_ui_browse_rule(), args, **kwargs)
 
     @classmethod
     def odm_ui_m_form_rule(cls) -> str:
@@ -157,7 +157,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
             'eid': '0' if self.is_new else str(self.id),
         })
 
-        return _router.rule_url(self.odm_ui_m_form_rule(), args, **kwargs)
+        return router.rule_url(self.odm_ui_m_form_rule(), args, **kwargs)
 
     @property
     def modify_url(self) -> str:
@@ -165,12 +165,12 @@ class UIEntity(_odm_auth.model.OwnedEntity):
         """
         return self.odm_ui_m_form_url()
 
-    def odm_ui_m_form_setup(self, frm: _form.Form):
+    def odm_ui_m_form_setup(self, frm: form.Form):
         """Hook
         """
         pass
 
-    def odm_ui_m_form_setup_widgets(self, frm: _form.Form):
+    def odm_ui_m_form_setup_widgets(self, frm: form.Form):
         """Hook
         """
         weight = 0
@@ -180,8 +180,8 @@ class UIEntity(_odm_auth.model.OwnedEntity):
 
             weight += 10
 
-            if isinstance(field, _odm.field.Bool):
-                frm.add_widget(_widget.select.Checkbox(
+            if isinstance(field, odm.field.Bool):
+                frm.add_widget(widget.select.Checkbox(
                     uid=uid,
                     weight=weight,
                     label=self.t(uid),
@@ -189,8 +189,8 @@ class UIEntity(_odm_auth.model.OwnedEntity):
                     default=field.default,
                     value=field.get_val(),
                 ))
-            elif isinstance(field, _odm.field.Integer):
-                frm.add_widget(_widget.input.Integer(
+            elif isinstance(field, odm.field.Integer):
+                frm.add_widget(widget.input.Integer(
                     uid=uid,
                     weight=weight,
                     label=self.t(uid),
@@ -198,8 +198,8 @@ class UIEntity(_odm_auth.model.OwnedEntity):
                     default=field.default,
                     value=field.get_val(),
                 ))
-            elif isinstance(field, _odm.field.Decimal):
-                frm.add_widget(_widget.input.Decimal(
+            elif isinstance(field, odm.field.Decimal):
+                frm.add_widget(widget.input.Decimal(
                     uid=uid,
                     weight=weight,
                     label=self.t(uid),
@@ -207,8 +207,8 @@ class UIEntity(_odm_auth.model.OwnedEntity):
                     default=field.default,
                     value=field.get_val(),
                 ))
-            elif isinstance(field, _odm.field.Email):
-                frm.add_widget(_widget.input.Email(
+            elif isinstance(field, odm.field.Email):
+                frm.add_widget(widget.input.Email(
                     uid=uid,
                     weight=weight,
                     label=self.t(uid),
@@ -216,8 +216,8 @@ class UIEntity(_odm_auth.model.OwnedEntity):
                     default=field.default,
                     value=field.get_val(),
                 ))
-            elif isinstance(field, _odm.field.String):
-                frm.add_widget(_widget.input.Text(
+            elif isinstance(field, odm.field.String):
+                frm.add_widget(widget.input.Text(
                     uid=uid,
                     weight=weight,
                     label=self.t(uid),
@@ -225,8 +225,8 @@ class UIEntity(_odm_auth.model.OwnedEntity):
                     default=field.default,
                     value=field.get_val(),
                 ))
-            elif isinstance(field, _odm.field.Enum):
-                frm.add_widget(_widget.select.Select(
+            elif isinstance(field, odm.field.Enum):
+                frm.add_widget(widget.select.Select(
                     uid=uid,
                     weight=weight,
                     label=self.t(uid),
@@ -236,12 +236,12 @@ class UIEntity(_odm_auth.model.OwnedEntity):
                     value=field.get_val(),
                 ))
 
-    def odm_ui_m_form_validate(self, frm: _form.Form):
+    def odm_ui_m_form_validate(self, frm: form.Form):
         """Hook
         """
         pass
 
-    def odm_ui_m_form_submit(self, frm: _form.Form):
+    def odm_ui_m_form_submit(self, frm: form.Form):
         """Hook
         """
         # Populate form values to entity fields
@@ -251,7 +251,7 @@ class UIEntity(_odm_auth.model.OwnedEntity):
 
         # Save entity
         self.save()
-        _router.session().add_info_message(_lang.t('odm_ui@operation_successful'))
+        router.session().add_info_message(lang.t('odm_ui@operation_successful'))
 
     @classmethod
     def odm_ui_d_form_rule(cls) -> str:
@@ -266,19 +266,19 @@ class UIEntity(_odm_auth.model.OwnedEntity):
             'eids': str(self.id)
         })
 
-        return _router.rule_url(self.odm_ui_d_form_rule(), args, **kwargs)
+        return router.rule_url(self.odm_ui_d_form_rule(), args, **kwargs)
 
-    def odm_ui_d_form_setup(self, frm: _form.Form):
+    def odm_ui_d_form_setup(self, frm: form.Form):
         """Hook
         """
         raise NotImplementedError('Not implemented yet')
 
-    def odm_ui_d_form_setup_widgets(self, frm: _form.Form):
+    def odm_ui_d_form_setup_widgets(self, frm: form.Form):
         """Hook
         """
         raise NotImplementedError('Not implemented yet')
 
-    def odm_ui_d_form_validate(self, frm: _form.Form):
+    def odm_ui_d_form_validate(self, frm: form.Form):
         """Hook
         """
         raise NotImplementedError('Not implemented yet')
@@ -306,9 +306,9 @@ class UIEntity(_odm_auth.model.OwnedEntity):
             'eid': str(self.id),
         })
 
-        return _router.rule_url(self.odm_ui_view_rule(), args, **kwargs)
+        return router.rule_url(self.odm_ui_view_rule(), args, **kwargs)
 
-    def odm_ui_widget_select_search_entities(self, f: _odm.MultiModelFinder, args: dict):
+    def odm_ui_widget_select_search_entities(self, f: odm.MultiModelFinder, args: dict):
         """Hook
         """
         pass

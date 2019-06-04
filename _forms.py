@@ -4,14 +4,13 @@ __author__ = 'Oleksandr Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
-from pytsite import lang as _lang, http as _http, events as _events, router as _router, html as _html, \
-    logger as _logger, errors as _errors
-from plugins import widget as _widget, form as _form, odm as _odm, odm_auth as _odm_auth
+from pytsite import lang, http, events, router, html, logger, errors
+from plugins import widget, form, odm, odm_auth
 from plugins.odm_auth import PERM_CREATE, PERM_MODIFY, PERM_DELETE
 from . import _model
 
 
-class Modify(_form.Form):
+class Modify(form.Form):
     def _on_setup_form(self):
         """Hook
         """
@@ -25,15 +24,15 @@ class Modify(_form.Form):
         try:
             from ._api import dispense_entity
             entity = dispense_entity(model, self.attr('eid'))
-        except _odm.error.EntityNotFound:
-            raise _http.error.NotFound()
+        except odm.error.EntityNotFound:
+            raise http.error.NotFound()
 
         if entity.is_new:
             # Check if entities of this model can be created
             perms_allow = entity.odm_auth_check_entity_permissions(PERM_CREATE)
             odm_ui_allows = entity.odm_ui_creation_allowed()
             if not (perms_allow and odm_ui_allows):
-                raise _http.error.Forbidden()
+                raise http.error.Forbidden()
 
             # Setup form title
             self.title = entity.t('odm_ui_form_title_create_' + model)
@@ -42,14 +41,14 @@ class Modify(_form.Form):
             perms_allow = entity.odm_auth_check_entity_permissions(PERM_MODIFY)
             odm_ui_allows = entity.odm_ui_modification_allowed()
             if not (perms_allow and odm_ui_allows):
-                raise _http.error.Forbidden()
+                raise http.error.Forbidden()
 
             # Setup form title
             self.title = entity.t('odm_ui_form_title_modify_' + model)
 
         # Setting up the form through entity hook and global event
         entity.odm_ui_m_form_setup(self)
-        _events.fire('odm_ui@m_form_setup.{}'.format(model), frm=self, entity=entity)
+        events.fire('odm_ui@m_form_setup.{}'.format(model), frm=self, entity=entity)
 
         # Redirect
         if not self.redirect:
@@ -67,25 +66,25 @@ class Modify(_form.Form):
         # Setting up form's widgets through entity hook and global event
         entity = dispense_entity(model, eid)
         entity.odm_ui_m_form_setup_widgets(self)
-        _events.fire('odm_ui@m_form_setup_widgets.{}'.format(model), frm=self, entity=entity)
+        events.fire('odm_ui@m_form_setup_widgets.{}'.format(model), frm=self, entity=entity)
 
         if self.current_step == 1:
             # Entity model
-            self.add_widget(_widget.input.Hidden(
+            self.add_widget(widget.input.Hidden(
                 uid='model',
                 value=model,
                 form_area='hidden',
             ))
 
             # Entity ID
-            self.add_widget(_widget.input.Hidden(
+            self.add_widget(widget.input.Hidden(
                 uid='eid',
                 value=eid,
                 form_area='hidden',
             ))
 
             # Entity ref
-            self.add_widget(_widget.input.Hidden(
+            self.add_widget(widget.input.Hidden(
                 uid='ref',
                 value=entity.ref if not entity.is_new else None,
                 form_area='hidden',
@@ -99,13 +98,13 @@ class Modify(_form.Form):
             elif not entity.is_new and entity.odm_ui_view_url():
                 cancel_href = entity.odm_ui_view_url()
             else:
-                cancel_href = _router.base_url()
+                cancel_href = router.base_url()
 
         # Cancel button
-        self.add_widget(_widget.button.Link(
+        self.add_widget(widget.button.Link(
             uid='action_cancel_' + str(self.current_step),
             weight=150,
-            value=_lang.t('odm_ui@cancel'),
+            value=lang.t('odm_ui@cancel'),
             icon='fa fas fa-fw fa-remove fa-times',
             href=cancel_href,
             form_area='footer',
@@ -127,7 +126,7 @@ class Modify(_form.Form):
         try:
             entity.odm_ui_m_form_submit(self)
         except Exception as e:
-            _router.session().add_error_message(str(e))
+            router.session().add_error_message(str(e))
             raise e
 
         # Process 'special' redirect endpoint
@@ -135,7 +134,7 @@ class Modify(_form.Form):
             self.redirect = entity.odm_ui_view_url()
 
 
-class MassAction(_form.Form):
+class MassAction(form.Form):
     """ODM UI Mass Action Form.
     """
 
@@ -154,7 +153,7 @@ class MassAction(_form.Form):
 
         if not self.redirect:
             from ._api import get_model_class
-            self.redirect = _router.rule_url(get_model_class(model).odm_ui_browse_rule(), {'model': model})
+            self.redirect = router.rule_url(get_model_class(model).odm_ui_browse_rule(), {'model': model})
 
         self.css += ' odm-ui-mass-action-form'
 
@@ -164,24 +163,24 @@ class MassAction(_form.Form):
         from ._api import dispense_entity
 
         # List of items to process
-        ol = _html.Ol()
+        ol = html.Ol()
         for eid in self.attr('eids', self.attr('ids', [])):
             entity = dispense_entity(self.attr('model'), eid)
-            self.add_widget(_widget.input.Hidden(uid='eids-' + eid, name='eids', value=eid))
-            ol.append(_html.Li(entity.odm_ui_mass_action_entity_description()))
-        self.add_widget(_widget.static.HTML(uid='eids-text', em=ol))
+            self.add_widget(widget.input.Hidden(uid='eids-' + eid, name='eids', value=eid))
+            ol.append(html.Li(entity.odm_ui_mass_action_entity_description()))
+        self.add_widget(widget.static.HTML(uid='eids-text', em=ol))
 
         # Submit button
-        submit_button = self.get_widget('action_submit')  # type: _widget.button.Submit
-        submit_button.value = _lang.t('odm_ui@continue')
+        submit_button = self.get_widget('action_submit')  # type: widget.button.Submit
+        submit_button.value = lang.t('odm_ui@continue')
         submit_button.icon = 'angle-double-right'
 
         # Cancel button
-        self.add_widget(_widget.button.Link(
+        self.add_widget(widget.button.Link(
             uid='action_cancel',
             weight=100,
-            value=_lang.t('odm_ui@cancel'),
-            href=self.referer or self.redirect or _router.base_url(),
+            value=lang.t('odm_ui@cancel'),
+            href=self.referer or self.redirect or router.base_url(),
             icon='fa fas fa-ban',
             form_area='footer'
         ))
@@ -203,12 +202,12 @@ class Delete(MassAction):
 
         # Check permissions
         for eid in self.attr('eids', self.attr('ids', [])):
-            e = _odm.dispense(model, eid)  # type: _odm_auth.OwnedEntity
+            e = odm.dispense(model, eid)  # type: odm_auth.OwnedEntity
             if not e.odm_auth_check_entity_permissions(PERM_DELETE):
-                raise _http.error.Forbidden()
+                raise http.error.Forbidden()
 
         # Form title
-        model_class = _odm.get_model_class(model)  # type: _model.UIEntity
+        model_class = odm.get_model_class(model)  # type: _model.UIEntity
         self.title = model_class.t('odm_ui_form_title_delete_' + model)
 
         # Form CSS
@@ -232,9 +231,9 @@ class Delete(MassAction):
             for eid in self.attr('eids', self.attr('ids', [])):
                 dispense_entity(model, eid).odm_ui_d_form_submit()
 
-            _router.session().add_info_message(_lang.t('odm_ui@operation_successful'))
+            router.session().add_info_message(lang.t('odm_ui@operation_successful'))
 
         # Entity deletion was forbidden
-        except _errors.ForbidDeletion as e:
-            _logger.error(e)
-            _router.session().add_error_message(_lang.t('odm_ui@entity_deletion_forbidden') + '. ' + str(e))
+        except errors.ForbidDeletion as e:
+            logger.error(e)
+            router.session().add_error_message(lang.t('odm_ui@entity_deletion_forbidden') + '. ' + str(e))

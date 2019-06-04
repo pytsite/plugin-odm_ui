@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 7.6 (2019-06-04)
+
+Support of `odm_auth-4.0`.
+
+
 ### 7.5 (2019-05-27)
 
 Support of `odm_auth-3.2`.
