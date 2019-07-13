@@ -4,8 +4,9 @@ __author__ = 'Oleksandr Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
+import htmler
 from typing import Union
-from pytsite import router, lang, html, events, routing, errors
+from pytsite import router, lang, events, routing, errors
 from plugins import widget, auth, odm, http_api, odm_auth
 from plugins.odm_auth import PERM_CREATE, PERM_MODIFY, PERM_DELETE, PERM_MODIFY_OWN, PERM_DELETE_OWN
 from . import _api
@@ -187,7 +188,7 @@ class Browser:
             if self._model_class.odm_ui_entity_actions_enabled() and \
                     (self._model_class.odm_ui_modification_allowed() or self._model_class.odm_ui_deletion_allowed()):
 
-                actions = html.TagLessElement(child_sep='&nbsp;')
+                actions = htmler.TagLessElement(child_sep='&nbsp;')
                 for btn_data in entity.odm_ui_browser_entity_actions(self):
                     color = 'btn btn-sm btn-' + btn_data.get('color', 'default btn-light')
                     title = btn_data.get('title', '')
@@ -195,12 +196,12 @@ class Browser:
                     if not url:
                         rule = btn_data.get('rule')
                         url = router.rule_url(rule, {'ids': str(entity.id)}) if rule else '#'
-                    btn = html.A(href=url, css=color + ' ' + btn_data.get('css', ''), title=title, role='button')
+                    btn = htmler.A(href=url, css=color + ' ' + btn_data.get('css', ''), title=title, role='button')
                     if btn_data.get('disabled'):
                         btn.set_attr('aria_disabled', 'true')
                         btn.add_css('disabled')
-                    btn.append(html.I(css=btn_data.get('icon', 'fa fas fa-fw fa-question')))
-                    actions.append(btn)
+                    btn.append_child(htmler.I(css=btn_data.get('icon', 'fa fas fa-fw fa-question')))
+                    actions.append_child(btn)
 
                 fields_data['entity-actions'] = actions.render()
 
@@ -217,19 +218,19 @@ class Browser:
                 '__redirect': router.current_url(),
             })
             title = lang.t('odm_ui@create')
-            btn = html.A(href=create_form_url, css='btn btn-default btn-light add-button', title=title)
-            btn.append(html.I(css='fa fas fa-fw fa-plus'))
-            self._widget.toolbar.append(btn)
-            self._widget.toolbar.append(html.Span('&nbsp;'))
+            btn = htmler.A(href=create_form_url, css='btn btn-default btn-light add-button', title=title)
+            btn.append_child(htmler.I(css='fa fas fa-fw fa-plus'))
+            self._widget.toolbar.append_child(btn)
+            self._widget.toolbar.append_child(htmler.Span('&nbsp;'))
 
         # 'Delete' toolbar button
         if self._model_class.odm_ui_deletion_allowed():
             delete_form_url = router.rule_url(self._d_form_rule, {'model': self._model})
             title = lang.t('odm_ui@delete_selected')
-            btn = html.A(href=delete_form_url, css='hidden btn btn-danger mass-action-button sr-only', title=title)
-            btn.append(html.I(css='fa fas fa-fw fa-remove fa-times'))
-            self._widget.toolbar.append(btn)
-            self._widget.toolbar.append(html.Span('&nbsp;'))
+            btn = htmler.A(href=delete_form_url, css='hidden btn btn-danger mass-action-button sr-only', title=title)
+            btn.append_child(htmler.I(css='fa fas fa-fw fa-remove fa-times'))
+            self._widget.toolbar.append_child(btn)
+            self._widget.toolbar.append_child(htmler.Span('&nbsp;'))
 
         # Additional toolbar buttons
         for btn_data in self._model_class.odm_ui_browser_mass_action_buttons():
@@ -237,13 +238,13 @@ class Browser:
             url = router.rule_url(ep) if ep else '#'
             css = 'btn btn-{} mass-action-button'.format(btn_data.get('color', 'default btn-light'))
             icon = 'fa fas fa-fw fa-' + btn_data.get('icon', 'question')
-            button = html.A(href=url, css=css, title=btn_data.get('title'))
+            button = htmler.A(href=url, css=css, title=btn_data.get('title'))
             if icon:
-                button.append(html.I(css=icon))
-            self._widget.toolbar.append(button)
-            self._widget.toolbar.append(html.Span('&nbsp;'))
+                button.append_child(htmler.I(css=icon))
+            self._widget.toolbar.append_child(button)
+            self._widget.toolbar.append_child(htmler.Span('&nbsp;'))
 
-        frm = html.Form(self._widget.render(), action='#', method='post', css='table-responsive odm-ui-browser')
+        frm = htmler.Form(self._widget.render(), action='#', method='post', css='table-responsive odm-ui-browser')
 
         return frm.render()
 

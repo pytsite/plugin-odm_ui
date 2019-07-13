@@ -4,7 +4,8 @@ __author__ = 'Oleksandr Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
-from pytsite import lang, http, events, router, html, logger, errors
+import htmler
+from pytsite import lang, http, events, router, logger, errors
 from plugins import widget, form, odm, odm_auth
 from plugins.odm_auth import PERM_CREATE, PERM_MODIFY, PERM_DELETE
 from . import _model
@@ -163,11 +164,11 @@ class MassAction(form.Form):
         from ._api import dispense_entity
 
         # List of items to process
-        ol = html.Ol()
+        ol = htmler.Ol()
         for eid in self.attr('eids', self.attr('ids', [])):
             entity = dispense_entity(self.attr('model'), eid)
             self.add_widget(widget.input.Hidden(uid='eids-' + eid, name='eids', value=eid))
-            ol.append(html.Li(entity.odm_ui_mass_action_entity_description()))
+            ol.append_child(htmler.Li(entity.odm_ui_mass_action_entity_description()))
         self.add_widget(widget.static.HTML(uid='eids-text', em=ol))
 
         # Submit button

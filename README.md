@@ -4,6 +4,11 @@
 ## Changelog
 
 
+### 7.7 (2019-07-13)
+
+Support of `pytsite-9.0`.
+
+
 ### 7.6 (2019-06-04)
 
 Support of `odm_auth-4.0`.

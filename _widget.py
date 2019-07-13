@@ -4,10 +4,11 @@ __author__ = 'Oleksandr Shepetko'
 __email__ = 'a@shepetko.com'
 __license__ = 'MIT'
 
+import htmler
 from typing import List, Callable, Union, Iterable, Tuple
 from pyuca import Collator
 from json import dumps as json_dumps
-from pytsite import lang, html
+from pytsite import lang
 from plugins import widget, odm, http_api, odm_http_api
 
 _pyuca_col = Collator()
@@ -304,10 +305,10 @@ class EntityCheckboxes(widget.select.Checkboxes):
     def _get_element(self, **kwargs):
         """Hook
         """
-        container = html.TagLessElement()
-        container.append(html.Input(type='hidden', name=self.name))  # It is important to have an empty input!
+        container = htmler.TagLessElement()
+        container.append_child(htmler.Input(type='hidden', name=self.name))  # It is important to have an empty input!
         for entity in self._get_entities():
-            container.append(self._item_renderer(entity))
+            container.append_child(self._item_renderer(entity))
 
         return container
 
@@ -472,7 +473,7 @@ class EntitySlots(widget.Abstract):
 
         return self
 
-    def _get_element(self, **kwargs) -> html:
+    def _get_element(self, **kwargs) -> htmler.Element:
         self.data.update({
             'enabled': self._enabled,
             'empty_slot_title': self._empty_slot_title,
@@ -491,4 +492,4 @@ class EntitySlots(widget.Abstract):
             'value': json_dumps(self.get_val()),
         })
 
-        return html.Div(css='widget-component')
+        return htmler.Div(css='widget-component')
